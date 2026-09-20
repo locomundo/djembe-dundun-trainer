@@ -39,6 +39,9 @@ python3 tools/read_score.py Rhythm.pdf --rows 261,461,658 --staves signal,djembe
 python3 tools/render_rhythm.py --rhythm djole --bpm 100 --cycles 8
 ```
 
+Rendered WAVs land in `audio/`, which is gitignored — the full set runs to over
+a gigabyte and regenerates from the tools.
+
 Scores live in the `RHYTHMS` dict in `render_rhythm.py` and in `RHYTHMS` in the
 trainer, written on a subdivision grid:
 
@@ -57,17 +60,26 @@ modes of a drum head, struck by a filtered noise transient — but recorded
 samples turned out far more recognisable, so `samples/` holds conditioned
 one-shots and synthesis is only the fallback when a sample fails to load.
 
+## Hosting the trainer
+
+`dundun-trainer.html` needs the `samples/` folder beside it — it fetches the
+WAVs at runtime by relative path. Copy both and it works anywhere static files
+are served; there is nothing to build and no server-side code.
+
 ## What is not here
 
-**The source notation.** The scores these transcriptions were read from were
-written by my drum teacher and are his work, not mine, so they are not included.
-The tools are written against that layout, so to use `read_score.py` you will
-need your own scores in a similar format.
+**The source notation.** These transcriptions were read from one-page scores
+written by [Michael Agbodo](https://agbodo.nl), who teaches these rhythms. The
+rhythms themselves are traditional, but the scores are his work and he is
+preparing a book of them, so they are not included here. The tools are written
+against that layout, so to use `read_score.py` you will need your own scores in
+a similar format.
 
 ## Credits
 
-The rhythms are traditional. The particular arrangements — which parts, how they
-are broken down — were taught and notated by my teacher.
+Taught and notated by **[Michael Agbodo](https://agbodo.nl)**. The rhythms are
+traditional West-African repertoire; the scores they were transcribed from are
+his.
 
 Drum samples come from [Freesound](https://freesound.org); ten are CC0 and one
 is CC BY 3.0. Per-file sources and licences are in `samples/CREDITS.md`.

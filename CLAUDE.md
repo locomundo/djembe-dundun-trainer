@@ -10,9 +10,24 @@ notation. There is no build, no test suite, and no git repository.
 
 See `README.md` for the rhythm-by-rhythm index and the file-naming conventions.
 
-**The score PDFs are not tracked by git** — they are the teacher's work, and the
-repo is public. They live in this folder but are gitignored, along with `audio/`
-(regenerable, 1.6 GB) and the lesson videos. Do not add them.
+**The score PDFs live one level up, outside the repo.** This repo sits inside a
+larger personal folder that holds the source material:
+
+```
+djembe/                        <- PDFs, lesson videos, reference image
+  djembe-dundun-trainer/       <- this repo (public)
+    tools/  samples/  audio/   <- audio is generated and gitignored
+```
+
+The PDFs are Michael Agbodo's work and he is preparing a book of them, so they
+are deliberately outside the repo — not merely gitignored. Read a score with a
+path up and out:
+
+```sh
+python3 tools/read_score.py ../Gumbé.pdf --rows ... --staves ...
+```
+
+`audio/` is generated, gitignored, and about 1.6 GB.
 
 ## Reading the notation PDFs
 
