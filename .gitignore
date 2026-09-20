@@ -1,0 +1,13 @@
+# Source notation — copyright the teacher who wrote it, not redistributed here
+*.pdf
+references.jpeg
+
+# Lesson videos
+*.mp4
+
+# Rendered output — regenerate with tools/render_rhythm.py
+audio/
+
+__pycache__/
+*.pyc
+.DS_Store

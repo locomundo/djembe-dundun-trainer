@@ -1,0 +1,1063 @@
+<title>Dundun Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#12100E; --panel:#1C1815; --raise:#272120; --line:#3A312C; --line-soft:#2B2421;
+  --ink:#EDE6DE; --muted:#A2948A; --faint:#6E625B;
+  --accent:#E0A33E; --accent-ink:#2A1E0C;
+  --slap:#E05A50; --open:#3CBB74; --bass:#C9BDB2;
+  --cell:#221D1A; --cell-beat:#2A2320; --playhead:rgba(224,163,62,.16);
+  --radius:3px;
+}
+:root:not([data-theme="dark"]) { color-scheme: dark; }
+:root[data-theme="light"]{
+  color-scheme: light;
+  --ground:#EDE7DC; --panel:#F5F1E9; --raise:#FFFDF8; --line:#CFC5B4; --line-soft:#DED5C6;
+  --ink:#1F1A16; --muted:#6B5F54; --faint:#9C9085;
+  --accent:#A96A10; --accent-ink:#FFF8EC;
+  --slap:#C0372E; --open:#1E8A50; --bass:#5A5049;
+  --cell:#E6DFD2; --cell-beat:#DCD3C3; --playhead:rgba(169,106,16,.15);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    color-scheme: light;
+    --ground:#EDE7DC; --panel:#F5F1E9; --raise:#FFFDF8; --line:#CFC5B4; --line-soft:#DED5C6;
+    --ink:#1F1A16; --muted:#6B5F54; --faint:#9C9085;
+    --accent:#A96A10; --accent-ink:#FFF8EC;
+    --slap:#C0372E; --open:#1E8A50; --bass:#5A5049;
+    --cell:#E6DFD2; --cell-beat:#DCD3C3; --playhead:rgba(169,106,16,.15);
+  }
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px; margin:0 auto; padding-inline:20px; padding-block:0 72px}
+header.mast{padding-block:30px 20px; border-bottom:1px solid var(--line-soft)}
+.switcher{display:flex; flex-wrap:wrap; gap:2px; margin-bottom:20px; border:1px solid var(--line); border-radius:2px; max-width:100%; width:max-content; padding:2px}
+.rbtn{font-family:"IBM Plex Mono",monospace; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+  padding:7px 16px; border-radius:1px; color:var(--faint)}
+.rbtn:hover{color:var(--ink)}
+.rbtn[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); font-weight:600}
+.begin{position:absolute; top:-1px; left:50%; transform:translateX(-50%); width:0; height:0;
+  border-left:4px solid transparent; border-right:4px solid transparent; border-top:6px solid var(--accent)}
+.lab .beginlab{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--accent)}
+.einde{position:absolute; bottom:-1px; left:50%; transform:translateX(-50%); width:0; height:0;
+  border-left:4px solid transparent; border-right:4px solid transparent; border-bottom:6px solid var(--ink)}
+.lg em.e{background:none; border-radius:0; height:16px; color:var(--ink); font-size:.85rem}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:.72rem; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--accent); margin:0 0 10px
+}
+h1{
+  font-family:"Bricolage Grotesque",system-ui,sans-serif;
+  font-weight:700; font-size:clamp(2.1rem,6vw,3.4rem); line-height:.95; letter-spacing:-.02em;
+  margin:0; text-wrap:balance;
+}
+.standfirst{max-width:64ch; color:var(--muted); margin:14px 0 0; font-size:1.02rem}
+.standfirst b{color:var(--ink); font-weight:600}
+
+.transport{
+  position:sticky; top:0; z-index:20; margin-top:20px;
+  background:color-mix(in srgb,var(--panel) 94%,transparent);
+  backdrop-filter:blur(8px); border:1px solid var(--line); border-radius:var(--radius);
+  display:flex; flex-wrap:wrap; align-items:center; gap:16px; padding:12px 14px;
+}
+button{font:inherit; color:inherit; cursor:pointer; background:none; border:none}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.play{
+  display:inline-flex; align-items:center; gap:9px; background:var(--accent); color:var(--accent-ink);
+  font-weight:600; padding:9px 20px 9px 16px; border-radius:2px;
+}
+.play:hover{filter:brightness(1.08)}
+.ghost{border:1px solid var(--line); padding:8px 13px; border-radius:2px; color:var(--muted); font-size:.86rem; font-weight:500}
+.ghost:hover{border-color:var(--accent); color:var(--ink)}
+.ghost[aria-pressed="true"]{border-color:var(--accent); color:var(--accent-ink); background:var(--accent)}
+.ghost.armed{border-color:var(--accent); color:var(--accent)}
+.tempo{display:flex; align-items:center; gap:11px; flex:1 1 240px; min-width:200px}
+.tempo label{font-size:.72rem; letter-spacing:.13em; text-transform:uppercase; color:var(--faint)}
+input[type=range]{flex:1; accent-color:var(--accent); min-width:90px; height:22px}
+.bpm{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:1.05rem; font-weight:600; min-width:5.6ch; text-align:right}
+.bpm em{font-style:normal; font-size:.68rem; color:var(--faint); font-weight:400}
+.counter{font-family:"IBM Plex Mono",monospace; font-size:.8rem; color:var(--faint); font-variant-numeric:tabular-nums}
+.counter b{color:var(--accent); font-weight:600}
+
+.board{margin-top:26px; border:1px solid var(--line); border-radius:var(--radius); background:var(--panel); overflow:hidden}
+.scroller{overflow-x:auto}
+.rows{--labw:190px; --n:32}
+.ruler{display:grid; grid-template-columns:var(--labw) 1fr; border-bottom:1px solid var(--line)}
+.ruler .spacer{grid-column:1; grid-row:1 / span 2; border-right:1px solid var(--line);
+  display:flex; align-items:flex-end; padding:0 0 5px 12px}
+.ticks{display:grid; grid-template-columns:repeat(var(--n),1fr)}
+.tick{font-family:"IBM Plex Mono",monospace; font-size:.6rem; min-width:0; color:var(--faint); text-align:center; padding:7px 0 6px; border-left:1px solid transparent}
+.tick.beat{border-left-color:var(--line-soft); color:var(--muted)}
+.tick.bar{border-left-color:var(--line); color:var(--accent); font-weight:600}
+.hands{grid-column:2; display:grid; grid-template-columns:repeat(var(--n),1fr); border-top:1px solid var(--line-soft)}
+.hnd{font-family:"IBM Plex Mono",monospace; font-size:.58rem; min-width:0; text-align:center;
+  padding:3px 0 4px; border-left:1px solid transparent; color:var(--faint)}
+.hnd.beat{border-left-color:var(--line-soft)}
+.hnd.bar{border-left-color:var(--line)}
+.hnd.r{color:var(--muted); font-weight:600}
+
+.row{display:grid; grid-template-columns:var(--labw) 1fr; border-top:1px solid var(--line-soft)}
+.row:first-of-type{border-top:none}
+.row.call{background:color-mix(in srgb,var(--accent) 5%,transparent); transition:background .12s}
+.row.call.sounding{background:color-mix(in srgb,var(--accent) 20%,transparent)}
+.row.call.sounding .nm{color:var(--accent)}
+.row.dun .lab .nm{color:var(--accent)}
+.lab{border-right:1px solid var(--line); padding:10px 12px; display:flex; flex-direction:column; gap:7px; justify-content:center}
+.lab .nm{font-weight:600; font-size:.94rem; line-height:1.2}
+.lab .sub{font-family:"IBM Plex Mono",monospace; font-size:.64rem; letter-spacing:.1em; text-transform:uppercase; color:var(--faint)}
+.ctl{display:flex; gap:4px; flex-wrap:wrap}
+.ctl button{font-family:"IBM Plex Mono",monospace; font-size:.62rem; letter-spacing:.07em; border:1px solid var(--line); padding:3px 7px; border-radius:2px; color:var(--faint)}
+.ctl button:hover{color:var(--ink); border-color:var(--muted)}
+.ctl button[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--accent-ink); font-weight:600}
+.lanes{display:flex; flex-direction:column; justify-content:center; gap:2px; padding:6px 0}
+.lane{display:grid; grid-template-columns:repeat(var(--n),1fr); transition:opacity .15s}
+.lane.off{opacity:.22}
+.c{position:relative; height:30px; min-width:0; border-left:1px solid transparent; display:grid; place-items:center; font-family:"IBM Plex Mono",monospace; font-size:.78rem; font-weight:600}
+.lane.bell .c{height:17px; font-size:.6rem; font-weight:400}
+.c.beat{border-left-color:var(--line-soft)}
+.c.bar{border-left-color:var(--line)}
+.c i{font-style:normal; display:grid; place-items:center; width:82%; max-width:26px; height:calc(100% - 6px); background:var(--cell); border-radius:2px; color:var(--bass); transition:transform .08s, filter .08s}
+.c.beat i,.c.bar i{background:var(--cell-beat)}
+.c[data-s="S"] i{color:var(--slap); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--slap) 45%,transparent)}
+.c[data-s="O"] i{color:var(--open); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--open) 45%,transparent)}
+.c[data-s="B"] i{background:color-mix(in srgb,var(--bass) 22%,var(--cell)); color:var(--ink)}
+.c[data-s="x"] i{color:var(--faint); background:none}
+/* columns where both hands land together — the anchor points */
+.c.both::after{content:""; position:absolute; left:18%; right:18%; bottom:-1px; height:2px; background:var(--accent); border-radius:2px}
+.c.hit i{transform:scale(1.18); filter:brightness(1.6)}
+.c.now{background:var(--playhead)}
+.c b{position:absolute; bottom:-2px; left:0; right:0; text-align:center; pointer-events:none;
+  font-family:"IBM Plex Mono",monospace; font-size:.52rem; font-weight:400; line-height:1; color:var(--faint)}
+.rows.nohands .c b,.rows.nohands .hands{display:none}
+@media (prefers-reduced-motion:reduce){.c i{transition:none}}
+
+.legend{display:flex; flex-wrap:wrap; gap:8px 20px; padding:12px 14px; border-top:1px solid var(--line); background:var(--raise)}
+.lg{display:flex; align-items:center; gap:7px; font-size:.78rem; color:var(--muted)}
+.lg em{font-style:normal; font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:.72rem; width:22px; height:22px; display:grid; place-items:center; background:var(--cell); border-radius:2px; color:var(--bass)}
+.lg em.s{color:var(--slap); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--slap) 45%,transparent)}
+.lg em.o{color:var(--open); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--open) 45%,transparent)}
+.lg em.b{background:color-mix(in srgb,var(--bass) 22%,var(--cell)); color:var(--ink)}
+.lg em.u{background:none; border-bottom:2px solid var(--accent); border-radius:0; height:16px}
+
+h2{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:700; font-size:1.55rem; letter-spacing:-.01em; margin:56px 0 4px; text-wrap:balance}
+.sect-note{color:var(--muted); margin:0 0 24px; max-width:64ch; font-size:.95rem}
+.sect-note b{color:var(--ink); font-weight:600}
+
+/* difficulty ladder — order is the teaching sequence, so numbering is real */
+.ladder{display:flex; flex-direction:column; gap:14px}
+.step{display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:start; border:1px solid var(--line-soft); border-radius:var(--radius); padding:18px; background:var(--panel)}
+.step .no{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-size:1.8rem; font-weight:700; line-height:1; color:var(--accent); font-variant-numeric:tabular-nums}
+.step h3{margin:0 0 3px; font-size:1.08rem; font-weight:600; display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+.step h3 span{font-family:"IBM Plex Mono",monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); font-weight:400}
+.step p{margin:8px 0 0; font-size:.92rem; color:var(--muted); max-width:62ch}
+.step p b{color:var(--ink); font-weight:600}
+.say{margin-top:12px; padding:11px 13px; background:var(--raise); border-left:2px solid var(--accent); border-radius:0 2px 2px 0}
+.say .k{font-family:"IBM Plex Mono",monospace; font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); display:block; margin-bottom:5px}
+.say .v{font-family:"IBM Plex Mono",monospace; font-size:.88rem; color:var(--ink); white-space:nowrap; overflow-x:auto; display:block; letter-spacing:.02em}
+.say .v b{color:var(--accent); font-weight:600}
+
+.drill{counter-reset:d; list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:11px; max-width:66ch}
+.drill li{counter-increment:d; display:grid; grid-template-columns:auto 1fr; gap:13px; font-size:.94rem; color:var(--muted)}
+.drill li::before{content:counter(d); font-family:"IBM Plex Mono",monospace; font-size:.72rem; font-weight:600; color:var(--accent-ink); background:var(--accent); width:21px; height:21px; border-radius:50%; display:grid; place-items:center; margin-top:2px}
+.drill b{color:var(--ink); font-weight:600}
+
+.notes{display:grid; grid-template-columns:repeat(auto-fit,minmax(266px,1fr)); gap:1px; background:var(--line-soft); border:1px solid var(--line-soft)}
+.note{background:var(--panel); padding:18px}
+.note h3{margin:0; font-size:1rem; font-weight:600; display:flex; align-items:baseline; gap:9px}
+.note h3 span{font-family:"IBM Plex Mono",monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); font-weight:400}
+.note p{margin:9px 0 0; font-size:.9rem; color:var(--muted)}
+.note p b{color:var(--ink); font-weight:600}
+.note .pat{font-family:"IBM Plex Mono",monospace; font-size:.76rem; color:var(--faint); margin-top:11px; white-space:nowrap; overflow-x:auto}
+footer{margin-top:52px; padding-top:20px; border-top:1px solid var(--line-soft); color:var(--faint); font-size:.83rem; max-width:64ch}
+@media(max-width:620px){
+  .rows{--labw:132px}
+  header.mast{padding-block:32px 16px}
+  .transport{gap:11px; padding:10px}
+  .lab{padding:8px 9px}
+  .lab .nm{font-size:.84rem}
+  .step{grid-template-columns:1fr; gap:8px; padding:15px}
+}
+</style>
+<div class="wrap">
+<header class="mast">
+  <div class="switcher" style="flex-wrap:wrap" role="group" aria-label="Choose a rhythm">
+    <button class="rbtn" data-r="djole" aria-pressed="true">Djole</button>
+    <button class="rbtn" data-r="fankani" aria-pressed="false">Fankani</button>
+    <button class="rbtn" data-r="djole-guinee" aria-pressed="false">Djolé&nbsp;(Guinée)</button>
+    <button class="rbtn" data-r="gidamba" aria-pressed="false">Gidamba</button>
+    <button class="rbtn" data-r="gumbe" aria-pressed="false">Gumbé</button>
+    <button class="rbtn" data-r="soli-lent" aria-pressed="false">Soli&nbsp;Lent</button>
+    <button class="rbtn" data-r="sunun" aria-pressed="false">Sunun</button>
+    <button class="rbtn" data-r="toro" aria-pressed="false">Toro</button>
+  </div>
+  <p class="eyebrow" id="origin">Guinea · 4/4 · two-bar cycle</p>
+  <h1 id="rname">Djole</h1>
+  <p class="standfirst" id="standfirst"></p>
+
+  <div class="transport">
+    <button class="play" id="play"><span id="glyph">▶</span><span id="playlab">Play</span></button>
+    <button class="ghost" id="callbtn">Play the call</button>
+    <button class="ghost" id="clickbtn" aria-pressed="false">Click</button>
+    <button class="ghost" id="handbtn" aria-pressed="true">Hands</button>
+    <div class="tempo">
+      <label for="bpm">Tempo</label>
+      <input type="range" id="bpm" min="40" max="148" step="1" value="88">
+      <div class="bpm"><span id="bpmval">88</span> <em>bpm</em></div>
+    </div>
+    <div class="counter">bar <b id="barno">1</b> · beat <b id="beatno">1</b>
+      &nbsp;·&nbsp; <b id="srcbadge">samples load on play</b></div>
+  </div>
+</header>
+
+<div class="board">
+  <div class="scroller"><div class="rows" id="rows"></div></div>
+  <div class="legend">
+    <div class="lg"><em class="b">B</em> bass</div>
+    <div class="lg"><em>T</em> tone</div>
+    <div class="lg"><em class="s">S</em> slap</div>
+    <div class="lg"><em class="o">O</em> open dundun tone</div>
+    <div class="lg"><em>M</em> muted dundun tone</div>
+    <div class="lg"><em>✕</em> bell</div>
+    <div class="lg"><em class="u"></em> both hands together</div>
+    <div class="lg"><em class="e">▲</em> where the piece ends</div>
+    <div class="lg"><em>R</em>/<em>L</em> which hand — djembe parts only</div>
+  </div>
+</div>
+
+<h2>Learning the dunduns, easiest first</h2>
+<p class="sect-note" id="laddernote"></p>
+<div class="ladder" id="ladder"></div>
+
+<h2>How to actually drill it</h2>
+<p class="sect-note">The trap is practising both hands at once from the start and hoping they separate.
+They don't — you get two half-learned parts. The bell has to become automatic <b>first</b>, because in
+performance it is the part that never stops.</p>
+<ol class="drill">
+  <li><b>Bell alone, until it is boring.</b> Switch the drum lane off above and play only the bell,
+  for minutes at a time, until you can hold a conversation over it.</li>
+  <li><b>Sing the drum part over it.</b> Keep playing the bell and only <b>voice</b> the drum strokes.
+  This builds the relationship between the two lines without asking your hands to do anything new.</li>
+  <li><b>Add the drum hand on the coincidences only.</b> Every column with an ochre underline is a
+  stroke where both hands move together. Two hands moving as one is not independence, and it is much
+  easier than it looks.</li>
+  <li><b>Fill in the rest.</b> Whatever is left is bell-only — so it belongs to the bell hand, which
+  you already made automatic in step 1.</li>
+  <li><b>Drop the tempo far lower than feels necessary.</b> Take the slider to 40–55. Coordination is
+  learned at the speed where you can consciously place each stroke; speed arrives on its own.</li>
+  <li><b>Practise away from the drums.</b> Bell hand on one knee, drum hand on the other. Most of this
+  is a brain problem, not a hands problem.</li>
+</ol>
+<p class="sect-note" style="margin-top:22px">Most players give the bell to the weaker hand and the
+stick to the stronger one, since the drum strokes carry the dynamics — but follow whatever your
+teacher does, because switching later is genuinely annoying.</p>
+
+<h2>How each part sits</h2>
+<p class="sect-note" id="partsnote"></p>
+<div class="notes" id="notes"></div>
+
+<footer>Transcribed from the original scores — six or seven staves each, on a sixteenth-note grid
+(Gidamba in twelve-eight). Sticking is positional: every even slot is the right hand, every odd one
+the left, which is what the sheets print above the djembe staves. Sounds are recorded instruments from Freesound, trimmed and level-matched;
+the three dunduns come from one session, the djembe strokes from three different drums. Mostly CC0 —
+djembe slap sample by klemmy via Freesound, CC&nbsp;BY&nbsp;3.0.</footer>
+</div>
+<script>
+"use strict";
+let CYCLE = 32;
+const x = (s) => s.replace(/[|\s]/g,"");
+const rep = (s,n) => x(s).repeat(n);
+const CALL = { key:"signal", name:"Signal", sub:"call", call:true, pickup:true,
+  drum: rep("T.TT|.T.T|T.SS|S...",2),
+  blurb:"The call. Tones through the first half, then three slaps to announce the break. Each bar is led into by a pick-up tone on the sixteenth before beat 1.",
+  pat:"(T) T . T T &nbsp; . T . T &nbsp; T . S S &nbsp; S . . ." };
+
+const RHYTHMS = {
+  djole: {
+    div:4,
+    name:"Djole", origin:"Guinea · 4/4 · two-bar cycle",
+    standfirst:"Every part from the score on a sixteenth-note grid. The dundun parts split into two lanes — <b>drum</b> and <b>bell</b> — so you can switch one hand off and drill the other against the ensemble. The ochre underline marks the columns where <b>both hands land together</b>; those are the anchors you build the part around.",
+    parts:[ CALL,
+      { key:"djembe1", name:"Djembé 1", sub:"one bar",
+        drum: rep("B.TT|B.SS|B.TT|B.SS",2),
+        blurb:"Bass on every quarter, then a pair on the <b>&amp;</b> and <b>a</b>: tones on beats 1 and 3, slaps on beats 2 and 4. That alternation is the whole part.",
+        pat:"B . T T &nbsp; B . S S &nbsp; B . T T &nbsp; B . S S" },
+      { key:"djembe2", name:"Djembé 2", sub:"two bars",
+        drum: x("B..T|T...|B...|TTTT") + x("T..T|T...|B...|T..."),
+        blurb:"The only part that really needs both bars. Bar 1 opens on a <b>bass</b> and ends with four straight tones; bar 2 opens on a <b>tone</b> and ends with one.",
+        pat:"B . . T &nbsp; T . . . &nbsp; B . . . &nbsp; T T T T<br>T . . T &nbsp; T . . . &nbsp; B . . . &nbsp; T . . ." },
+      { key:"sangban", name:"Sangban", sub:"half bar", dun:true,
+        drum: rep("O...|M...",4), bell: rep("x.x.|x.x.",4),
+        blurb:"Open tone on 1, <b>muted</b> tone on 2. The bell runs straight eighths, so the drum takes every other bell stroke.",
+        pat:"drum &nbsp; O . . . &nbsp; M . . .<br>bell &nbsp; ✕ . ✕ . &nbsp; ✕ . ✕ ." },
+      { key:"kenkeni", name:"Kenkeni", sub:"one beat", dun:true,
+        drum: rep("..TT",8), bell: rep("..xx",8),
+        blurb:"Drum and bell in <b>unison</b>, and nothing on the beat itself — the pair sits on <b>&amp;</b> and <b>a</b>. The easiest place to start.",
+        pat:"drum &nbsp; . . T T<br>bell &nbsp; . . ✕ ✕" },
+      { key:"doundounba", name:"Doundounba", sub:"half bar", dun:true,
+        drum: rep("O...|....",4), bell: rep("x.xx|.xx.",4),
+        blurb:"One deep open tone per half bar. The bell carries everything else alone — which is what makes this the hardest of the three.",
+        pat:"drum &nbsp; O . . . &nbsp; . . . .<br>bell &nbsp; ✕ . ✕ ✕ &nbsp; . ✕ ✕ ." },
+    ],
+    ladder:[
+      {n:"Kenkeni", tag:"no independence needed", body:"Drum and bell are in <b>unison</b> — every stroke, both hands, always. The only difficulty is placement: nothing falls on the beat.",
+       say:["count it","rest, rest, <b>both</b>, <b>both</b>"]},
+      {n:"Sangban", tag:"bell twice per drum stroke", body:"The bell runs straight eighths and the drum takes <b>every other one</b>. Nothing ever lands alone on the drum hand. Add the <b>choke</b> last — beat 1 rings, beat 2 is muted.",
+       say:["say the composite","<b>BOTH</b> &nbsp; bell &nbsp; <b>BOTH</b> &nbsp; bell"]},
+      {n:"Doundounba", tag:"the genuinely hard one", body:"The bell plays a syncopated five-stroke figure, the drum plays <b>once</b> per half bar. Four of the five bell strokes are bell-only.",
+       say:["say the composite","<b>BOTH</b> &nbsp; – &nbsp; ka &nbsp; ka &nbsp; – &nbsp; ka &nbsp; ka &nbsp; –"]},
+    ],
+    note:"The three dundun parts are not equally hard, and the score says why: it comes down to <b>how often the two hands coincide</b>.",
+  },
+
+  fankani: {
+    div:4,
+    name:"Fankani", origin:"4/4 · two-bar cycle · slap-driven",
+    standfirst:"Where Djole is built on a bass every quarter, <b>Fankani is built on slaps</b> — both djembe parts open on one and keep coming back to it. The dundun lanes split into <b>drum</b> and <b>bell</b> as before, and the ochre underline marks where both hands land together. In Fankani that is <b>every single drum stroke</b>.",
+    parts:[ CALL,
+      { key:"djembe1", name:"Djembé 1", sub:"one bar",
+        drum: rep("S..S|S.B.|S.TT|S.B.",2),
+        blurb:"A slap on every quarter. Beats 1–2 answer with a <b>bass on the &amp;</b>; beats 3–4 answer with <b>two tones</b>, then another bass. The slap on the <b>a</b> of beat 1 is the one that trips people up.",
+        pat:"S . . S &nbsp; S . B . &nbsp; S . T T &nbsp; S . B ." },
+      { key:"djembe2", name:"Djembé 2", sub:"half bar",
+        drum: rep("S..S|S.TT",4),
+        blurb:"Same opening as Djembé 1, but it resolves into <b>two tones</b> every half bar instead of alternating. Shortest part on the sheet — start here.",
+        pat:"S . . S &nbsp; S . T T" },
+      { key:"sangban", name:"Sangban", sub:"two bars", dun:true,
+        drum: x("....|..T.|T.TT|..O.") + x("....|..O.|..TT|..O."),
+        bell: rep("x.xx|.xx.",4), begin:26,
+        blurb:"The sheet marks <b>Begin</b> on the &amp; of bar 2 beat 3 — that is where the sangban's own cycle starts. The two bars are nearly identical; bar 1 has one extra closed tone.",
+        pat:"drum &nbsp; . . . . &nbsp; . . T . &nbsp; T . T T &nbsp; . . O .<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; . . . . &nbsp; . . O . &nbsp; . . T T &nbsp; . . O ." },
+      { key:"kenkeni", name:"Kenkeni", sub:"half bar", dun:true,
+        drum: rep("TT..|O...",4), bell: rep("xx.x|x.x.",4),
+        blurb:"Two closed tones on <b>1</b> and the <b>e</b>, then the <b>open</b> tone on 2. Every drum stroke has a bell stroke underneath it.",
+        pat:"drum &nbsp; T T . . &nbsp; O . . .<br>bell &nbsp; ✕ ✕ . ✕ &nbsp; ✕ . ✕ ." },
+      { key:"doundounba", name:"Doundounba", sub:"two bars", dun:true,
+        drum: x("....|....|....|..T.") + x("....|..T.|....|..T."),
+        bell: rep("x.xx|.xx.",4), begin:30,
+        blurb:"Only <b>three</b> drum strokes in the whole cycle, all on the <b>&amp;</b>. Note the gap — no stroke on the &amp; of bar 1 beat 2, even though the rest repeats every half bar. Kept literal from the sheet; worth checking with your teacher.",
+        pat:"drum &nbsp; . . . . &nbsp; . . . . &nbsp; . . . . &nbsp; . . T .<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; . . . . &nbsp; . . T . &nbsp; . . . . &nbsp; . . T ." },
+    ],
+    ladder:[
+      {n:"Kenkeni", tag:"12 drum strokes, 8 bell-only", body:"The densest drum part of the three, and every stroke is supported by the bell. Two closed tones then the open one — get that contrast clean before worrying about the bell.",
+       say:["count it","<b>both both</b> &nbsp; ka &nbsp; <b>both</b> &nbsp; – &nbsp; ka &nbsp; –"]},
+      {n:"Sangban", tag:"9 drum strokes, 11 bell-only", body:"A full two-bar phrase rather than a loop, so count the cycle rather than feeling it. Its <b>Begin</b> mark sits in bar 2 — the part does not start where the page does.",
+       say:["the busy bar","bar 1 beat 3: <b>T . T T</b> — the one place the drum hand gets dense"]},
+      {n:"Doundounba", tag:"3 drum strokes, 17 bell-only", body:"Hardest for the same reason as in Djole: the bell hand is alone almost the entire cycle, and the three drum strokes are far apart. Pure bell endurance.",
+       say:["say the composite","<b>BOTH</b> &nbsp; – &nbsp; ka &nbsp; ka &nbsp; – &nbsp; ka &nbsp; ka &nbsp; –"]},
+    ],
+    note:"In Fankani <b>every drum stroke lands on a bell stroke</b>, in all three parts — the drum hand never moves alone. The whole difficulty is holding the bell while the drum hand rests.",
+  },
+
+  "djole-guinee": {
+    div:4,
+    name:"Djolé (Guinée)", origin:"Guinea · 4/4 · two-bar cycle · three djembe parts",
+    standfirst:"The Guinean setting of Djolé, with <b>three</b> djembe parts instead of two. Its Djembé&nbsp;2 is note-for-note the Djembé&nbsp;1 of the other Djolé sheet, so if you know that one you already have a part here. The black triangles mark <b>Einde</b> — where the piece ends.",
+    parts:[ Object.assign({}, CALL, {einde:28}),
+      { key:"djembe1", name:"Djembé 1", sub:"half bar", einde:27,
+        drum: rep("S.SS|.STT",4),
+        blurb:"Slaps around a gap, then <b>two tones</b> to close each half bar. Dense — five strokes in eight — and the pair of slaps on <b>&amp;</b> and <b>a</b> is the awkward bit.",
+        pat:"S . S S &nbsp; . S T T" },
+      { key:"djembe2", name:"Djembé 2", sub:"half bar", einde:28,
+        drum: rep("B.TT|B.SS",4),
+        blurb:"<b>Exactly the Djembé 1 part from the other Djolé sheet</b> — bass on the quarter, then a pair on <b>&amp;</b> and <b>a</b>, tones then slaps. Free if you already know it.",
+        pat:"B . T T &nbsp; B . S S" },
+      { key:"djembe3", name:"Djembé 3", sub:"two bars", einde:28,
+        drum: x("S...|S...|S..T|T...") + x("S...|TTTT|TT.T|T..."),
+        blurb:"The solo-ish part. Four bare <b>open slaps</b> — drawn underlined on the sheet, so let them ring — then bar 2 opens out into a run of six straight tones. Sparse, then suddenly not.",
+        pat:"S . . . &nbsp; S . . . &nbsp; S . . T &nbsp; T . . .<br>S . . . &nbsp; T T T T &nbsp; T T . T &nbsp; T . . ." },
+      { key:"sangban", name:"Sangban", sub:"one bar", dun:true, einde:28,
+        drum: rep("....|T...|....|T.T.",2), bell: rep("x.x.",8),
+        blurb:"Three strokes a bar against a straight-eighths bell. The pair on beat 4 — <b>on the beat and on the &amp;</b> — is the figure to lock in.",
+        pat:"drum &nbsp; . . . . &nbsp; T . . . &nbsp; . . . . &nbsp; T . T .<br>bell &nbsp; ✕ . ✕ . &nbsp; ✕ . ✕ . &nbsp; ✕ . ✕ . &nbsp; ✕ . ✕ ." },
+      { key:"kenkeni", name:"Kenkeni", sub:"one beat", dun:true, einde:27,
+        drum: rep("..TT",8), bell: rep("..xx",8),
+        blurb:"<b>Identical to the other Djolé's kenkeni</b> — drum and bell in unison on <b>&amp;</b> and <b>a</b>, nothing on the beat.",
+        pat:"drum &nbsp; . . T T<br>bell &nbsp; . . ✕ ✕" },
+      { key:"doundounba", name:"Doundounba", sub:"one bar", dun:true, einde:28,
+        drum: rep("T...|....|T.T.|....",2), bell: rep("x.x.",8),
+        blurb:"The <b>same shape as the sangban, a beat earlier</b> — stroke on 1, then the pair on beat 3. Once you see that, the two parts are one idea.",
+        pat:"drum &nbsp; T . . . &nbsp; . . . . &nbsp; T . T . &nbsp; . . . .<br>bell &nbsp; ✕ . ✕ . &nbsp; ✕ . ✕ . &nbsp; ✕ . ✕ . &nbsp; ✕ . ✕ ." },
+    ],
+    ladder:[
+      {n:"Kenkeni", tag:"unison — no independence needed", body:"Drum and bell together on every stroke, exactly as in the other Djolé. Nothing on the beat; the pair sits on <b>&amp;</b> and <b>a</b>.",
+       say:["count it","rest, rest, <b>both</b>, <b>both</b>"]},
+      {n:"Doundounba", tag:"6 drum strokes, 10 bell-only", body:"Bell on straight eighths, drum on 1 and then the pair on beat 3. Every drum stroke sits on a bell stroke, so the hands never split — you are just holding the bell through the gaps.",
+       say:["say the composite","<b>BOTH</b> &nbsp; bell &nbsp; <b>BOTH</b> &nbsp; <b>BOTH</b> &nbsp; bell &nbsp; bell"]},
+      {n:"Sangban", tag:"same again, a beat later", body:"The identical figure to the doundounba, shifted one beat on. Learn doundounba first and this is nearly free — but playing them against each other is the hard part, because the shift is what you feel.",
+       say:["the relationship","sangban = doundounba, one beat later"]},
+    ],
+    note:"Both the sangban and the doundounba run against a <b>straight-eighths bell</b>, and every drum stroke lands on one — so no hand ever moves alone. The catch is that the two parts are the same figure a beat apart, which is easy to play and hard to hear.",
+  },
+
+  gidamba: {
+    div:3,
+    name:"Gidamba", origin:"12/8 · ternary · four-bar cycle",
+    standfirst:"The first <b>ternary</b> rhythm here — three subdivisions to the beat, not four, counted <b>1 la li</b>. The doundounba runs a genuine <b>four-bar phrase</b> where every other part is a short loop, so the grid is four bars long and most rows simply repeat inside it.",
+    parts:[
+      { key:"signal", name:"Signal", sub:"call", call:true, pickup:true, einde:21,
+        drum: rep("TTT|TT.|TT.|T..",4),
+        blurb:"A run of tones led in by two grace notes, thinning out across the bar: three, then two, then two, then one.",
+        pat:"(TT) T T T &nbsp; T T . &nbsp; T T . &nbsp; T . ." },
+      { key:"djembe1", name:"Djembé 1", sub:"two beats", einde:21,
+        drum: rep("S.T|S..",8),
+        blurb:"The simplest part on the sheet — <b>slap, tone, slap</b> across two beats, then a rest. Six slots and you have it.",
+        pat:"S . T &nbsp; S . ." },
+      { key:"djembe2", name:"Djembé 2", sub:"two beats", einde:21,
+        drum: rep("S.S|STT",8),
+        blurb:"Three slaps into <b>two tones</b>. The slap on the <b>li</b> of beat 1 running straight into the slap on beat 2 is the bit to get clean.",
+        pat:"S . S &nbsp; S T T" },
+      { key:"sangban", name:"Sangban", sub:"two beats", dun:true, einde:21,
+        drum: rep("O..|T..",8), bell: rep("xx.",16),
+        blurb:"One stroke per beat, alternating <b>open</b> and <b>closed</b>. The bell is the simplest on any of these sheets: two strokes then a gap, every beat.",
+        pat:"drum &nbsp; O . . &nbsp; T . .<br>bell &nbsp; ✕ ✕ . &nbsp; ✕ ✕ ." },
+      { key:"kenkeni", name:"Kenkeni", sub:"one bar", dun:true, begin:23, einde:21,
+        drum: rep("T.T|.T.|.T.|T..",4), bell: rep("x.x|.x.|xx.|x.x",4),
+        blurb:"Every drum stroke sits on a bell stroke; the bell adds two more. A one-bar loop, and the easiest of the three to hold.",
+        pat:"drum &nbsp; T . T &nbsp; . T . &nbsp; . T . &nbsp; T . .<br>bell &nbsp; ✕ . ✕ &nbsp; . ✕ . &nbsp; ✕ ✕ . &nbsp; ✕ . ✕" },
+      { key:"doundounba", name:"Doundounba", sub:"four bars", dun:true, begin:47, einde:45,
+        drum: x("T.T|...|...|..T").repeat(2) + x("T.T|.TT|.T.|T.T") + x("T.T|...|...|T.T"),
+        bell: x("x.x|.x.|xx.|x.x").repeat(2) + x("x.x|.xx|.x.|x.x") + x("x.x|.x.|xx.|x.x"),
+        blurb:"The only part here that is a real phrase rather than a loop. Bars 1–2 are sparse — three strokes each. <b>Bar 3 fills right up and the bell doubles the drum exactly</b>, then bar 4 thins out again.",
+        pat:"bar 1–2 &nbsp; T . T &nbsp; . . . &nbsp; . . . &nbsp; . . T<br>bar 3 &nbsp;&nbsp;&nbsp;&nbsp; T . T &nbsp; . T T &nbsp; . T . &nbsp; T . T<br>bar 4 &nbsp;&nbsp;&nbsp;&nbsp; T . T &nbsp; . . . &nbsp; . . . &nbsp; T . T" },
+    ],
+    ladder:[
+      {n:"Kenkeni", tag:"20 drum, 8 bell-only", body:"A one-bar loop where the drum is a subset of the bell — every drum stroke has a bell under it and the bell adds only two more. The densest drum part and the least coordination work.",
+       say:["count it","<b>both</b> la <b>both</b> &nbsp; li <b>both</b> li &nbsp; ka <b>both</b> li &nbsp; <b>both</b> la ka"]},
+      {n:"Sangban", tag:"16 drum, 16 bell-only", body:"More bell-only strokes than anything else here, but the bell is trivially regular — <b>two then a gap</b>, every beat — and the drum is one stroke per beat, alternating open and closed. Easy to hold, once the choke is clean.",
+       say:["say the composite","<b>BOTH</b> &nbsp; bell &nbsp; – &nbsp;│&nbsp; <b>BOTH</b> &nbsp; bell &nbsp; –"]},
+      {n:"Doundounba", tag:"a four-bar phrase", body:"Hardest not because of the hands but because of the <b>memory</b> — it is the only part that does not loop every bar or two. Learn bar 3 first: drum and bell are in unison the whole bar, so it is the one bar that needs no independence at all.",
+       say:["the shape","sparse · sparse · <b>full</b> · thin"]},
+    ],
+    note:"Gidamba is in <b>12/8</b>, so count <b>1 la li</b> rather than <b>1 e &amp; a</b>. Every drum stroke in all three dundun parts lands on a bell stroke, so no hand ever moves alone — the work is holding the bell through the gaps, and remembering the doundounba's phrase.",
+  },
+
+  gumbe: {
+    div:4,
+    name:"Gumbé", origin:"4/4 · two-bar cycle · two sangban parts",
+    standfirst:"The only sheet here with <b>two sangban parts</b>, playing against each other on different bells. Its call is different too — all tones, no slaps, unlike the call the Djolé family shares. The djembe parts are short loops; the doundounba takes the full two bars.",
+    parts:[
+      { key:"signal", name:"Signal", sub:"call", call:true, pickup:true, einde:28,
+        drum: rep("T.TT|.T.T|T.T.|T...",2),
+        blurb:"A different call from the Djolé family — <b>all tones, no slaps</b>. It thins out across the bar: three strokes, then two, then two, then one.",
+        pat:"(T) T . T T &nbsp; . T . T &nbsp; T . T . &nbsp; T . . ." },
+      { key:"djembe1", name:"Djembé 1", sub:"half bar", einde:28,
+        drum: rep("TT.S|TTS.",4),
+        blurb:"Two tones into a slap, twice, with the slap landing on the <b>a</b> the first time and the <b>&amp;</b> the second. That shift is the whole part.",
+        pat:"T T . S &nbsp; T T S ." },
+      { key:"djembe2", name:"Djembé 2", sub:"half bar", einde:30,
+        drum: rep("B.TT|..S.",4),
+        blurb:"Bass, two tones, then a single slap on the <b>&amp;</b> of beat 2. The sparsest djembe part on any of these sheets.",
+        pat:"B . T T &nbsp; . . S ." },
+      { key:"sangban", name:"Sangban 1", sub:"half bar", dun:true, einde:28,
+        drum: rep("O...|T.T.",4), bell: rep("x.",16),
+        blurb:"Open tone on 1, then a pair of closed tones on beat 2. Straight-eighths bell — and <b>only four bell strokes per cycle have no drum under them</b>, the least of any part here.",
+        pat:"drum &nbsp; O . . . &nbsp; T . T .<br>bell &nbsp; ✕ . ✕ . &nbsp; ✕ . ✕ ." },
+      { key:"sangban2", name:"Sangban 2", sub:"half bar", dun:true, einde:28,
+        drum: rep("TT..|O...",4), bell: rep("xx.x|x.x.",4),
+        blurb:"The second sangban answers the first: <b>two closed tones on the beat</b>, then the open one on 2 — where Sangban 1 has it on 1. Its bell is different too.",
+        pat:"drum &nbsp; T T . . &nbsp; O . . .<br>bell &nbsp; ✕ ✕ . ✕ &nbsp; ✕ . ✕ ." },
+      { key:"kenkeni", name:"Kenkeni", sub:"one beat", dun:true, einde:28,
+        drum: rep("T...",8), bell: rep("x.",16),
+        blurb:"One stroke on every beat against a straight-eighths bell. The simplest part on the page and the obvious way in.",
+        pat:"drum &nbsp; T . . .<br>bell &nbsp; ✕ . ✕ ." },
+      { key:"doundounba", name:"Doundounba", sub:"one bar", dun:true, einde:28,
+        drum: rep("O..O|..T.|T.T.|....",2), bell: rep("x.xx|.xx.|x.x.|x.x.",2),
+        blurb:"Two <b>open</b> tones a dotted beat apart, then three closed ones, then a whole beat of rest. Note the bell changes halfway through the bar — syncopated for two beats, then straight eighths.",
+        pat:"drum &nbsp; O . . O &nbsp; . . T . &nbsp; T . T . &nbsp; . . . .<br>bell &nbsp; ✕ . ✕ ✕ &nbsp; . ✕ ✕ . &nbsp; ✕ . ✕ . &nbsp; ✕ . ✕ ." },
+    ],
+    ladder:[
+      {n:"Kenkeni", tag:"8 bell-only", body:"One drum stroke per beat, bell on the eighths. Every drum stroke has a bell under it and the gaps are single strokes. Start here.",
+       say:["count it","<b>BOTH</b> &nbsp; bell &nbsp; <b>BOTH</b> &nbsp; bell"]},
+      {n:"Sangban 1", tag:"4 bell-only — the fewest here", body:"Almost every bell stroke carries a drum stroke, so there is barely any independence to build. The work is the <b>open-then-closed</b> contrast, not the coordination.",
+       say:["say the composite","<b>BOTH</b> &nbsp; bell &nbsp; <b>BOTH</b> &nbsp; <b>BOTH</b>"]},
+      {n:"Doundounba", tag:"10 bell-only, and a shifting bell", body:"Hardest of the four because the <b>bell itself changes mid-bar</b> — syncopated for two beats, then straight eighths. Get the bell alone through that change before adding the drum hand.",
+       say:["the bell alone","✕ . ✕ ✕ &nbsp; . ✕ ✕ . &nbsp;│&nbsp; ✕ . ✕ . &nbsp; ✕ . ✕ ."]},
+    ],
+    note:"Two sangban parts means two different bells running at once — if you are learning one, mute the other until it is solid, or you will drift into its bell.",
+  },
+
+  "soli-lent": {
+    div:4,
+    name:"Soli Lent", origin:"4/4 · two-bar cycle · slow",
+    standfirst:"Slow, and built on <b>two-bar djembe phrases</b> rather than short loops — both djembe parts run the full sixteen slots before repeating. The doundounba is the sparsest on any of these sheets: <b>three strokes in the whole cycle</b>.",
+    parts:[
+      { key:"signal", name:"Signal", sub:"call", call:true, pickup:true,
+        drum: rep("T.TT|.T.T|T.SS|S...",2),
+        blurb:"The call the Djolé family shares — tones, then three slaps.",
+        pat:"(T) T . T T &nbsp; . T . T &nbsp; T . S S &nbsp; S . . ." },
+      { key:"djembe1", name:"Djembé 1", sub:"one bar",
+        drum: rep("B.TT|..ST|T.BS|..S.",2),
+        blurb:"A full bar before it repeats. Bass, two tones, then a <b>slap-tone-tone</b> run across beats 2–3 into a second bass. The densest part on the sheet.",
+        pat:"B . T T &nbsp; . . S T &nbsp; T . B S &nbsp; . . S ." },
+      { key:"djembe2", name:"Djembé 2", sub:"one bar",
+        drum: rep("S..S|S.TT|S.BS|S.TT",2),
+        blurb:"Slap on every beat, answered by <b>two tones</b> on beats 2 and 4. The bass on beat 3 is the only thing that distinguishes the two halves.",
+        pat:"S . . S &nbsp; S . T T &nbsp; S . B S &nbsp; S . T T" },
+      { key:"sangban", name:"Sangban", sub:"one bar", dun:true,
+        drum: rep("T...|T...|T.O.|T...",2), bell: rep("x.",16),
+        blurb:"A closed tone on every beat, with one <b>open</b> tone on the &amp; of beat 3 — the only colour in the part. Straight-eighths bell.",
+        pat:"drum &nbsp; T . . . &nbsp; T . . . &nbsp; T . O . &nbsp; T . . .<br>bell &nbsp; ✕ . ✕ . &nbsp; ✕ . ✕ ." },
+      { key:"kenkeni", name:"Kenkeni", sub:"half bar", dun:true, begin:30,
+        drum: rep("T...|..T.",4), bell: rep("x.xx|.xx.",4),
+        blurb:"Two strokes per half bar — on the beat and on the <b>&amp;</b> of the next — against the syncopated bell.",
+        pat:"drum &nbsp; T . . . &nbsp; . . T .<br>bell &nbsp; ✕ . ✕ ✕ &nbsp; . ✕ ✕ ." },
+      { key:"doundounba", name:"Doundounba", sub:"two bars", dun:true,
+        drum: x("....|....|..T.|....") + x("....|....|..T.|T..."),
+        bell: rep("x.xx|.xx.|x.x.|x.x.",2),
+        blurb:"<b>Three strokes in the entire two-bar cycle</b> — one in bar 1, two in bar 2. Almost pure bell endurance; the drum hand is waiting nearly the whole time.",
+        pat:"bar 1 &nbsp; . . . . &nbsp; . . . . &nbsp; . . T . &nbsp; . . . .<br>bar 2 &nbsp; . . . . &nbsp; . . . . &nbsp; . . T . &nbsp; T . . ." },
+    ],
+    ladder:[
+      {n:"Sangban", tag:"8 bell-only", body:"A stroke on every beat against straight eighths — the bell simply fills the gaps. Add the single <b>open</b> tone on the &amp; of beat 3 once the rest is automatic.",
+       say:["say the composite","<b>BOTH</b> &nbsp; bell &nbsp; <b>BOTH</b> &nbsp; bell"]},
+      {n:"Kenkeni", tag:"12 bell-only", body:"Only two drum strokes per half bar, and the second lands on the <b>&amp;</b> — off the beat, against a bell that is also syncopated. This is where the independence actually starts.",
+       say:["the composite","<b>BOTH</b> &nbsp; ka &nbsp; ka &nbsp; – &nbsp; ka &nbsp; <b>BOTH</b> &nbsp; –"]},
+      {n:"Doundounba", tag:"17 bell-only — three drum strokes total", body:"The sparsest dundun part on any of these sheets. There is no coordination pattern to learn, only the ability to keep the bell going for two bars and place three strokes accurately inside it.",
+       say:["the shape","bar 1: one stroke &nbsp;│&nbsp; bar 2: two"]},
+    ],
+    note:"Soli Lent is slow, which makes it less forgiving — there is time to hear every stroke land early or late. Take the tempo <b>down</b>, not up.",
+  },
+
+  sunun: {
+    div:4,
+    name:"Sunun", origin:"4/4 · two-bar cycle",
+    standfirst:"Slap-heavy djembe parts over the busiest doundounba on any of these sheets — and unusually, that doundounba is the <b>easiest</b> dundun part here, because its bell doubles almost every stroke.",
+    parts:[
+      { key:"signal", name:"Signal", sub:"call", call:true, pickup:true,
+        drum: rep("T.TT|.T.T|T.SS|S...",2),
+        blurb:"The call the Djolé family shares.",
+        pat:"(T) T . T T &nbsp; . T . T &nbsp; T . S S &nbsp; S . . ." },
+      { key:"djembe1", name:"Djembé 1", sub:"one bar", begin:31,
+        drum: rep("T.SS|..ST|T.SS|B.ST",2),
+        blurb:"A tone then <b>two slaps</b>, twice over, with a bass replacing the tone the second time. Nine strokes to the bar — the busiest djembe part here.",
+        pat:"T . S S &nbsp; . . S T &nbsp; T . S S &nbsp; B . S T" },
+      { key:"djembe2", name:"Djembé 2", sub:"half bar",
+        drum: rep("S..S|S.TT",4),
+        blurb:"<b>The same part as Fankani's Djembé 2</b> — slap, slap on the <b>a</b>, slap on 2, then two tones. Free if you know that one.",
+        pat:"S . . S &nbsp; S . T T" },
+      { key:"sangban", name:"Sangban", sub:"half bar", dun:true, begin:30,
+        drum: rep("T...|..T.",4), bell: rep("x.xx|.xx.",4),
+        blurb:"Two strokes per half bar against the syncopated bell — on the beat, then on the <b>&amp;</b> of the next.",
+        pat:"drum &nbsp; T . . . &nbsp; . . T .<br>bell &nbsp; ✕ . ✕ ✕ &nbsp; . ✕ ✕ ." },
+      { key:"kenkeni", name:"Kenkeni", sub:"one beat", dun:true,
+        drum: rep("T...",8), bell: rep("x.",16),
+        blurb:"One stroke on every beat, straight-eighths bell. As simple as it gets.",
+        pat:"drum &nbsp; T . . .<br>bell &nbsp; ✕ . ✕ ." },
+      { key:"doundounba", name:"Doundounba", sub:"one bar", dun:true, begin:31,
+        drum: rep("T.TT|..O.|..O.|O..T",2), bell: rep("x.xx|.xx.|x.x.|x.xx",2),
+        blurb:"Seven strokes a bar, mixing closed and <b>open</b> tones — and the bell doubles every one of them. Busy to play, but there is almost no independence in it.",
+        pat:"drum &nbsp; T . T T &nbsp; . . O . &nbsp; . . O . &nbsp; O . . T<br>bell &nbsp; ✕ . ✕ ✕ &nbsp; . ✕ ✕ . &nbsp; ✕ . ✕ . &nbsp; ✕ . ✕ ✕" },
+    ],
+    ladder:[
+      {n:"Doundounba", tag:"only 6 bell-only", body:"Counter-intuitively the <b>easiest</b> here. It is the busiest drum part on the page, but the bell doubles nearly every stroke, so the hands move together almost throughout. Learn the open/closed contrast, not independence.",
+       say:["say the composite","<b>BOTH</b> &nbsp; ka &nbsp; <b>BOTH</b> &nbsp; <b>BOTH</b>"]},
+      {n:"Kenkeni", tag:"8 bell-only", body:"One stroke per beat against the eighths. Straightforward, and a good rest for the head after the doundounba.",
+       say:["count it","<b>BOTH</b> &nbsp; bell &nbsp; <b>BOTH</b> &nbsp; bell"]},
+      {n:"Sangban", tag:"12 bell-only", body:"The hardest of the three despite being the sparsest: two drum strokes per half bar, the second off the beat, against a syncopated bell. The bell has to be completely automatic first.",
+       say:["the composite","<b>BOTH</b> &nbsp; ka &nbsp; ka &nbsp; – &nbsp; ka &nbsp; <b>BOTH</b> &nbsp; –"]},
+    ],
+    note:"A useful reversal here: <b>busier does not mean harder</b>. Sunun's doundounba has more than twice the strokes of its sangban and is far easier, because its bell doubles the drum.",
+  },
+
+  toro: {
+    div:4,
+    name:"Toro", origin:"4/4 · two-bar cycle · with an entry figure",
+    standfirst:"The only sheet with a written <b>entrance</b> — a one-bar slap figure that brings the ensemble in, then drops out. Both dundun parts are genuine two-bar phrases: the sangban changes its ending and the doundounba nearly stops in bar 2.",
+    parts:[
+      { key:"signal", name:"Signal", sub:"call", call:true, pickup:true,
+        drum: rep("T.TT|.T.T|T.SS|S...",2),
+        blurb:"The call the Djolé family shares.",
+        pat:"(T) T . T T &nbsp; . T . T &nbsp; T . S S &nbsp; S . . ." },
+      { key:"entrance", name:"Entrance", sub:"entry, bar 1",
+        drum: x("S...|S.S.|S...|S.S.") + ".".repeat(16),
+        blurb:"Played <b>once</b> to bring everyone in, then silent. Slaps on the beat with a pair on the &amp; — it is the sheet's count-in, not a part you loop.",
+        pat:"S . . . &nbsp; S . S . &nbsp; S . . . &nbsp; S . S ." },
+      { key:"djembe1", name:"Djembé 1", sub:"one bar",
+        drum: rep("TT.B|S.S.|S..B|S.S.",2),
+        blurb:"Two tones into a bass, then slaps the rest of the way. The second bass, on the <b>a</b> of beat 3, is the one that catches people.",
+        pat:"T T . B &nbsp; S . S . &nbsp; S . . B &nbsp; S . S ." },
+      { key:"djembe2", name:"Djembé 2", sub:"half bar", einde:26,
+        drum: rep("S..S|S.TT",4),
+        blurb:"<b>Again the Fankani / Sunun Djembé 2</b> — the same eight slots turn up on three different sheets.",
+        pat:"S . . S &nbsp; S . T T" },
+      { key:"sangban", name:"Sangban", sub:"two bars", dun:true, begin:26,
+        drum: x("TT..|O.O.|O...|T.T.") + x("TT..|O.O.|O...|O.O."),
+        bell: rep("xx.x|x.x.|x.x.|x.x.",2),
+        blurb:"A real two-bar phrase: identical for three beats, then bar 1 finishes on <b>closed</b> tones and bar 2 on <b>open</b> ones. That ending is the only difference — and it is easy to miss.",
+        pat:"bar 1 &nbsp; T T . . &nbsp; O . O . &nbsp; O . . . &nbsp; T . T .<br>bar 2 &nbsp; T T . . &nbsp; O . O . &nbsp; O . . . &nbsp; O . O ." },
+      { key:"kenkeni", name:"Kenkeni", sub:"half bar", dun:true,
+        drum: rep("..TT|..O.",4), bell: rep("x.xx|.xx.",4),
+        blurb:"Nothing on the beat — two closed tones on <b>&amp;</b> and <b>a</b>, then the <b>open</b> one on the &amp; of the next beat.",
+        pat:"drum &nbsp; . . T T &nbsp; . . O .<br>bell &nbsp; ✕ . ✕ ✕ &nbsp; . ✕ ✕ ." },
+      { key:"doundounba", name:"Doundounba", sub:"two bars", dun:true,
+        drum: x("TT..|....|..TT|.TT.") + x("TT..|....|....|...."),
+        bell: x("xx.x|x.x.|x.xx|.xx.") + x("xx.x|x.x.|x.x.|x.x."),
+        blurb:"Bar 1 answers its opening pair with a run across beats 3–4; <b>bar 2 plays the opening pair and then nothing at all</b>. The bell changes with it.",
+        pat:"bar 1 &nbsp; T T . . &nbsp; . . . . &nbsp; . . T T &nbsp; . T T .<br>bar 2 &nbsp; T T . . &nbsp; . . . . &nbsp; . . . . &nbsp; . . . ." },
+    ],
+    ladder:[
+      {n:"Sangban", tag:"only 4 bell-only", body:"Nearly every bell stroke carries a drum stroke, so there is very little independence to build. The whole difficulty is <b>remembering which bar you are in</b> — the two differ only in their last beat.",
+       say:["the difference","bar 1 ends <b>closed</b> · bar 2 ends <b>open</b>"]},
+      {n:"Kenkeni", tag:"8 bell-only", body:"Nothing lands on the beat, which is the only awkward thing about it. Both drum strokes of the pair sit on bell strokes.",
+       say:["count it","– &nbsp; ka &nbsp; <b>both</b> &nbsp; <b>both</b>"]},
+      {n:"Doundounba", tag:"11 bell-only, across two bars", body:"Bar 2 is almost entirely bell-only — the drum hand plays two strokes and then waits a bar and a half. Holding the bell steady through that emptiness is the actual skill.",
+       say:["the shape","bar 1: <b>full</b> &nbsp;│&nbsp; bar 2: two strokes, then nothing"]},
+    ],
+    note:"Toro's <b>entrance</b> row is played once to bring the ensemble in and then drops out — it is not a part to loop. Mute it once you are going.",
+  },
+};
+let RK = "djole";
+let PARTS = RHYTHMS[RK].parts;/* ---------------- audio ----------------
+   Real instruments: CC0/CC-BY samples from Freesound, trimmed and level-matched
+   (see samples/CREDITS.md). Synthesis stays as a fallback so the page still
+   works if a file fails to load. Everything runs through a small room reverb.  */
+let ctx=null, master=null, wet=null, VB={}, SAMPLED={};
+const SAMPLES = {
+  B:['bass'], T:['tone_1','tone_2','tone_3','tone_4'], S:['slap'],
+  sangban_O:['sangban_O'], sangban_M:['sangban_M'],
+  kenkeni_T:['kenkeni_T'], doundounba_T:['doundounba_T'], bell:['bell'],
+};
+const SRC = {
+  T:{ f0:218, bend:1.22, bt:.045, dur:.60, gain:.62,
+      modes:[[1,1,.40],[1.593,.52,.24],[2.135,.34,.17],[2.295,.26,.15],
+             [2.653,.20,.11],[2.917,.14,.09],[3.155,.10,.07],[3.50,.07,.055]],
+      noise:{amp:.42, hp:1100, lp:7000, dec:.016} },
+  B:{ f0:84, bend:1.55, bt:.05, dur:.75, gain:1.0,
+      modes:[[1,1,.38],[1.593,.26,.14],[2.135,.12,.09],[2.295,.08,.07]],
+      noise:{amp:.30, hp:180, lp:1400, dec:.022} },
+  S:{ f0:218, bend:1.06, bt:.02, dur:.32, gain:.80,
+      modes:[[1.593,.30,.075],[2.135,.42,.065],[2.653,.50,.055],[2.917,.45,.048],
+             [3.50,.38,.040],[4.06,.30,.034],[4.60,.22,.028]],
+      noise:{amp:1.0, hp:1700, lp:9000, dec:.045} },
+  sangban_O:{ f0:112, bend:1.35, bt:.04, dur:1.0, gain:.90,
+      modes:[[1,1,.55],[1.593,.18,.13],[2.135,.09,.08]], noise:{amp:.55, hp:2600, lp:11000, dec:.005} },
+  sangban_M:{ f0:112, bend:1.35, bt:.04, dur:.28, gain:.72,
+      modes:[[1,1,.09],[1.593,.14,.05],[2.135,.08,.04]], noise:{amp:.55, hp:2600, lp:11000, dec:.005} },
+  kenkeni_T:{ f0:176, bend:1.3, bt:.035, dur:.65, gain:.66,
+      modes:[[1,1,.34],[1.593,.20,.11],[2.135,.10,.07]], noise:{amp:.60, hp:3000, lp:12000, dec:.005} },
+  doundounba_T:{ f0:70, bend:1.42, bt:.055, dur:1.25, gain:1.05,
+      modes:[[1,1,.70],[1.593,.14,.13],[2.135,.07,.08]], noise:{amp:.45, hp:2200, lp:9000, dec:.006} },
+  bell:{ f0:900, bend:1.0, bt:.01, dur:.50, gain:.40,
+      modes:[[1,1,.16],[1.62,.85,.13],[2.31,.70,.10],[3.04,.55,.075],
+             [3.89,.42,.055],[5.12,.30,.040],[6.40,.20,.030]],
+      noise:{amp:.80, hp:3500, lp:14000, dec:.006} },
+  click:{ f0:1600, bend:1.0, bt:.01, dur:.09, gain:.30,
+      modes:[[1,1,.030],[2.02,.5,.020]], noise:{amp:.25, hp:4000, lp:12000, dec:.003} },
+};
+
+function renderVoice(d, seed){
+  const sr = ctx.sampleRate, n = Math.ceil(sr*d.dur), out = new Float32Array(n);
+  let rs = seed*2654435761 >>> 0;
+  const rnd = ()=>{ rs ^= rs<<13; rs>>>=0; rs ^= rs>>17; rs ^= rs<<5; rs>>>=0; return rs/4294967296*2-1; };
+  const det = 1 + (seed===0 ? 0 : (seed%2 ? .012 : -.009));
+  const ph = new Float64Array(d.modes.length);
+  for(let i=0;i<n;i++){
+    const t = i/sr, benv = 1 + (d.bend-1)*Math.exp(-t/d.bt);
+    let v = 0;
+    for(let m=0;m<d.modes.length;m++){
+      const a = d.modes[m];
+      ph[m] += 2*Math.PI * d.f0*det*a[0]*benv / sr;
+      v += Math.sin(ph[m]) * a[1] * Math.exp(-t/a[2]);
+    }
+    out[i] = v;
+  }
+  const N = d.noise;
+  const ah = Math.exp(-2*Math.PI*N.hp/sr), al = 1-Math.exp(-2*Math.PI*N.lp/sr);
+  let yh=0, xp=0, yl=0;
+  for(let i=0;i<n;i++){
+    const t=i/sr, e=Math.exp(-t/N.dec);
+    if(e < 1e-4) break;
+    const w = rnd();
+    yh = ah*(yh + w - xp); xp = w;
+    yl += al*(yh - yl);
+    out[i] += yl * N.amp * e;
+  }
+  let peak=0;
+  for(let i=0;i<n;i++) if(Math.abs(out[i])>peak) peak=Math.abs(out[i]);
+  const k = (peak>0 ? d.gain/peak : 0), fade = Math.min(600, (n/12)|0);
+  for(let i=0;i<n;i++){
+    let v = Math.tanh(out[i]*k*1.25)/1.25;
+    if(i < 48) v *= i/48;
+    if(i > n-fade) v *= (n-i)/fade;
+    out[i] = v;
+  }
+  const buf = ctx.createBuffer(1, n, sr);
+  buf.getChannelData(0).set(out);
+  return buf;
+}
+
+function roomIR(){
+  const sr = ctx.sampleRate, n = Math.ceil(sr*0.85), pre = (sr*0.008)|0;
+  const b = ctx.createBuffer(2, n, sr);
+  for(let c=0;c<2;c++){
+    const d = b.getChannelData(c);
+    for(let i=pre;i<n;i++){
+      const t=(i-pre)/(n-pre);
+      d[i] = (Math.random()*2-1) * Math.pow(1-t, 2.4) * 0.55;
+    }
+    [0.011,0.017,0.026].forEach((ms,k)=>{ const j=(sr*ms)|0; if(j<n) d[j] += (k%2?-1:1)*0.35; });
+  }
+  return b;
+}
+
+function boot(){
+  if(ctx) return;
+  ctx = new (window.AudioContext||window.webkitAudioContext)();
+  master = ctx.createGain(); master.gain.value = .85;
+  // six parts of sampled drums sum past full scale on the dense bars; catch it
+  // here rather than letting the output hard-clip
+  const limiter = ctx.createDynamicsCompressor();
+  limiter.threshold.value = -6; limiter.knee.value = 6; limiter.ratio.value = 8;
+  limiter.attack.value = 0.003; limiter.release.value = 0.12;
+  master.connect(limiter); limiter.connect(ctx.destination);
+  const conv = ctx.createConvolver(); conv.buffer = roomIR();
+  wet = ctx.createGain(); wet.gain.value = .16;
+  wet.connect(conv); conv.connect(master);
+  for(const k in SRC) VB[k] = [renderVoice(SRC[k], 1)];      // fallback, instantly available
+  loadSamples();
+}
+
+const badge = () => document.getElementById("srcbadge");
+async function loadSamples(){
+  let ok = 0, total = 0;
+  await Promise.all(Object.entries(SAMPLES).map(async ([voice, files])=>{
+    const bank = [];
+    for(const f of files){
+      total++;
+      try{
+        const r = await fetch(`samples/${f}.wav`);
+        if(!r.ok) throw new Error(r.status);
+        bank.push(await ctx.decodeAudioData(await r.arrayBuffer()));
+        ok++;
+      }catch(e){ /* keep the synthesised fallback for this one */ }
+    }
+    if(bank.length){ VB[voice] = bank; SAMPLED[voice] = true; }
+  }));
+  const b = badge();
+  if(b) b.textContent = ok === total ? "real instruments"
+       : ok ? `${ok}/${total} sampled` : "synthesised";
+}
+
+let rr = 0;
+function hit(voice, t, vel, pan){
+  const bank = VB[voice]; if(!bank || !bank.length) return;
+  const src = ctx.createBufferSource();
+  src.buffer = bank[(rr++) % bank.length];
+  src.playbackRate.value = 1 + (Math.random()-0.5)*0.018;
+  const g = ctx.createGain();
+  g.gain.value = vel * (0.93 + Math.random()*0.14);
+  const p = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+  if(p){ p.pan.value = pan||0; src.connect(g); g.connect(p); p.connect(master); p.connect(wet); }
+  else { src.connect(g); g.connect(master); g.connect(wet); }
+  src.start(t);
+}
+const PAN = { signal:0, entrance:0, djembe1:-.34, djembe2:.06, djembe3:.34,
+              sangban:-.18, sangban2:.10, kenkeni:.18, doundounba:0 };
+function voiceFor(key, ch){
+  if(ch==="x") return "bell";
+  if(key==="signal"||key==="entrance"||key.startsWith("djembe")) return ({B:"B",T:"T",S:"S"})[ch];
+  if(key==="sangban"||key==="sangban2") return ch==="O" ? "sangban_O" : "sangban_M";
+  if(key==="kenkeni") return "kenkeni_T";
+  if(key==="doundounba") return "doundounba_T";
+  return null;
+}
+
+/* ---------------- board ---------------- */
+let state = {}, cells = {}, lanesEl = {};
+const rowsEl = document.getElementById("rows");
+const COUNT = { 4:["1","e","&","a"], 3:["1","la","li"] };
+const DIV  = () => RHYTHMS[RK].div || 4;
+const BEAT = () => DIV() * 4;            // slots per bar
+const NSLOT= () => RHYTHMS[RK].parts.reduce((m,p)=>Math.max(m,p.drum.length),0);
+
+function buildRuler(){
+  const ruler = document.createElement("div");
+  ruler.className = "ruler";
+  ruler.innerHTML = '<div class="spacer"><span class="sub">count / hands</span></div>';
+  const ticks = document.createElement("div"); ticks.className = "ticks";
+  const d = DIV(), bar = BEAT(), names = COUNT[d];
+  for(let i=0;i<CYCLE;i++){
+    const t = document.createElement("div");
+    t.className = "tick" + (i%bar===0 ? " bar" : i%d===0 ? " beat" : "");
+    t.textContent = i%d===0 ? String(Math.floor(i/d)%4 + 1) : names[i%d];
+    ticks.appendChild(t);
+  }
+  ruler.appendChild(ticks);
+  // Sticking is purely positional - even slot right, odd left. That is what the
+  // sheets print as "R L R L", and as "R L R / L R L" in three, where groups of
+  // an odd length flip the alternation by themselves.
+  const hands = document.createElement("div"); hands.className = "hands";
+  for(let i=0;i<CYCLE;i++){
+    const t = document.createElement("div");
+    t.className = "hnd" + (i%bar===0 ? " bar" : i%d===0 ? " beat" : "") + (i%2 ? "" : " r");
+    t.textContent = i%2 ? "L" : "R";
+    hands.appendChild(t);
+  }
+  ruler.appendChild(hands);
+  return ruler;
+}
+
+function buildBoard(){
+  rowsEl.textContent = "";
+  CYCLE = NSLOT();
+  rowsEl.classList.toggle("nohands", !handsOn);
+  rowsEl.style.setProperty("--n", CYCLE);
+  rowsEl.style.minWidth = (190 + CYCLE * 19) + "px";
+  state = {}; cells = {}; lanesEl = {};
+  PARTS.forEach(p => state[p.key] = { drum:true, bell:true, solo:false });
+  rowsEl.appendChild(buildRuler());
+
+  PARTS.forEach(p=>{
+    const row = document.createElement("div");
+    row.className = "row" + (p.call ? " call" : "") + (p.dun ? " dun" : "");
+
+    const lab = document.createElement("div");
+    lab.className = "lab";
+    const mark = p.begin !== undefined ? ["begins", p.begin]
+               : p.einde !== undefined ? ["ends", p.einde] : null;
+    const beginTxt = mark
+      ? `<div class="beginlab">${mark[0]} bar ${Math.floor(mark[1]/BEAT())+1} · beat ${Math.floor((mark[1]%BEAT())/DIV())+1}</div>` : "";
+    lab.innerHTML = `<div><div class="nm">${p.name}</div><div class="sub">${p.sub}</div>${beginTxt}</div>`;
+    const ctl = document.createElement("div"); ctl.className = "ctl";
+    if(p.call){
+      ctl.innerHTML = '<span class="sub">use “play the call”</span>';
+    } else {
+      const mk = (text, lane, label) => {
+        const b = document.createElement("button");
+        b.textContent = text;
+        b.setAttribute("aria-pressed", String(state[p.key][lane]));
+        b.setAttribute("aria-label", `${label} — ${p.name}`);
+        b.onclick = ()=>{ state[p.key][lane] = !state[p.key][lane];
+                          b.setAttribute("aria-pressed", String(state[p.key][lane])); paintRows(); };
+        return b;
+      };
+      ctl.appendChild(mk(p.bell ? "DRUM" : "PLAY", "drum", p.bell ? "Drum" : "Play"));
+      if(p.bell) ctl.appendChild(mk("BELL", "bell", "Bell"));
+      const sb = document.createElement("button");
+      sb.textContent="SOLO"; sb.setAttribute("aria-pressed","false");
+      sb.setAttribute("aria-label","Solo "+p.name);
+      sb.onclick = ()=>{ state[p.key].solo = !state[p.key].solo;
+                         sb.setAttribute("aria-pressed", String(state[p.key].solo)); paintRows(); };
+      ctl.appendChild(sb);
+    }
+    lab.appendChild(ctl); row.appendChild(lab);
+
+    const lanes = document.createElement("div"); lanes.className="lanes";
+    cells[p.key] = {}; lanesEl[p.key] = {};
+    [["drum",p.drum],["bell",p.bell]].forEach(([kind,pat])=>{
+      if(!pat) return;
+      const lane = document.createElement("div"); lane.className="lane "+kind;
+      cells[p.key][kind] = []; lanesEl[p.key][kind] = lane;
+      pat = pat.length < CYCLE ? pat.repeat(Math.ceil(CYCLE/pat.length)).slice(0,CYCLE) : pat;
+      for(let i=0;i<CYCLE;i++){
+        const c = document.createElement("div");
+        c.className = "c" + (i%BEAT()===0 ? " bar" : i%DIV()===0 ? " beat" : "");
+        const ch = pat[i];
+        if(ch && ch!=="."){
+          c.dataset.s = ch;
+          c.innerHTML = `<i>${ch==="x" ? "✕" : ch}</i>`;
+          // the dundun staves carry no sticking - one hand is on the bell
+          if(!p.dun && kind==="drum") c.innerHTML += `<b>${i%2 ? "L" : "R"}</b>`;
+          const dr=p.drum[i%p.drum.length], be=p.bell && p.bell[i%p.bell.length];
+          if(be && dr !== "." && be !== ".") c.classList.add("both");
+        }
+        if(kind==="drum" && p.begin === i){
+          const m=document.createElement("span"); m.className="begin";
+          m.title="the part's own cycle begins here"; c.appendChild(m);
+        }
+        if(kind==="drum" && p.einde === i){
+          const m=document.createElement("span"); m.className="einde";
+          m.title="Einde — the piece ends on this stroke"; c.appendChild(m);
+        }
+        lane.appendChild(c); cells[p.key][kind].push(c);
+      }
+      lanes.appendChild(lane);
+    });
+    row.appendChild(lanes); rowsEl.appendChild(row);
+  });
+  paintRows();
+}
+
+function audible(key, lane){
+  const anySolo = PARTS.some(p => !p.call && state[p.key].solo);
+  const s = state[key];
+  if(anySolo && !s.solo) return false;
+  return s[lane];
+}
+function paintRows(){
+  PARTS.forEach(p=>{
+    if(p.call) return;
+    ["drum","bell"].forEach(lane=>{
+      const el = lanesEl[p.key][lane];
+      if(el) el.classList.toggle("off", !audible(p.key, lane));
+    });
+  });
+}
+
+function buildProse(){
+  const R = RHYTHMS[RK];
+  document.getElementById("rname").textContent = R.name;
+  document.getElementById("origin").textContent = R.origin;
+  document.getElementById("standfirst").innerHTML = R.standfirst;
+  document.getElementById("laddernote").innerHTML = R.note;
+  document.getElementById("ladder").innerHTML = R.ladder.map((s,i)=>`
+    <div class="step">
+      <div class="no">${i+1}</div>
+      <div>
+        <h3>${s.n} <span>${s.tag}</span></h3>
+        <p>${s.body}</p>
+        <div class="say"><span class="k">${s.say[0]}</span><span class="v">${s.say[1]}</span></div>
+      </div>
+    </div>`).join("");
+  document.getElementById("partsnote").innerHTML =
+    RK === "djole"
+      ? "Only Djembé&nbsp;2 uses the full two bars. Everything else is a shorter loop tiled inside the cycle."
+      : "Both dundun drum lines are full two-bar phrases with their own <b>Begin</b> marks, shown as a small arrow on the grid. The djembe parts are short loops.";
+  document.getElementById("notes").innerHTML = PARTS.map(p=>`
+    <div class="note">
+      <h3>${p.name} <span>${p.sub}</span></h3>
+      <p>${p.blurb}</p>
+      <div class="pat">${p.pat}</div>
+    </div>`).join("");
+}
+
+/* ---------------- transport ---------------- */
+let playing=false, bpm=88, nextTime=0, step=0, timer=null, armCall=false, callOn=false, clickOn=false;
+const queue=[];
+const bpmEl=document.getElementById("bpm"), bpmVal=document.getElementById("bpmval");
+const barNo=document.getElementById("barno"), beatNo=document.getElementById("beatno");
+const callBtn=document.getElementById("callbtn");
+bpmEl.addEventListener("input", ()=>{ bpm=+bpmEl.value; bpmVal.textContent=bpm; });
+const stepDur = ()=> 60/bpm/DIV();
+
+function scheduleStep(i, t){
+  PARTS.forEach(p=>{
+    if(p.call){
+      // lead into an armed call from the last slot of the cycle before it
+      if(!callOn){
+        if(armCall && p.pickup && i === CYCLE - 1)
+          hit("T", t + stepDur()*0.5, 0.9, PAN[p.key]);
+        return;
+      }
+      const ch = p.drum[i % p.drum.length];
+      // the lead drummer plays the call over the top of everyone, so lift it
+      // clearly above the ensemble instead of blending into the djembe parts
+      if(ch && ch!==".") hit(voiceFor(p.key,ch), t, 1.3, PAN[p.key]);
+      if(p.pickup && (i+1)%BEAT()===0 && i+1 < CYCLE)
+        hit("T", t + stepDur()*0.5, 0.9, PAN[p.key]);   // into the call's second bar
+      return;
+    }
+    // everyone drops back while the lead drummer is calling
+    const acc = ((i%DIV()===0) ? 1.05 : 0.9) * (callOn ? 0.5 : 1);
+    [["drum",p.drum,1],["bell",p.bell,0.75]].forEach(([kind,pat,g])=>{
+      if(!pat || !audible(p.key, kind)) return;
+      const ch = pat[i % pat.length];
+      if(!ch || ch===".") return;
+      hit(voiceFor(p.key,ch), t, acc*g, PAN[p.key]);
+    });
+  });
+  if(clickOn && i%DIV()===0) hit("click", t, i%BEAT()===0 ? 1 : 0.55, 0);
+}
+
+function tick(){
+  while(nextTime < ctx.currentTime + 0.12){
+    if(step===0){
+      if(armCall){ callOn = true; armCall = false; callBtn.classList.remove("armed"); }
+      else if(callOn){ callOn = false; }
+    }
+    scheduleStep(step, nextTime);
+    queue.push({step, t:nextTime, call:callOn});
+    nextTime += stepDur();
+    step = (step+1)%CYCLE;
+  }
+}
+
+let raf=null, lastPainted=-1;
+function paintPlayhead(){
+  if(!playing){ raf=null; return; }
+  const now = ctx.currentTime;
+  let cur=null, curCall=false;
+  while(queue.length && queue[0].t <= now){
+    const q = queue.shift(); cur = q.step; curCall = q.call;
+  }
+  if(cur!==null && cur!==lastPainted){
+    document.querySelectorAll(".c.now").forEach(c=>c.classList.remove("now"));
+    document.querySelectorAll(".c.hit").forEach(c=>c.classList.remove("hit"));
+    PARTS.forEach(p=>{
+      ["drum","bell"].forEach(kind=>{
+        const arr = cells[p.key][kind]; if(!arr) return;
+        const c = arr[cur];
+        c.classList.add("now");
+        if(c.dataset.s && (p.call ? curCall : audible(p.key, kind))) c.classList.add("hit");
+      });
+    });
+    const cr = document.querySelector(".row.call");
+    if(cr) cr.classList.toggle("sounding", curCall);
+    barNo.textContent = Math.floor(cur/BEAT())+1;
+    beatNo.textContent = Math.floor((cur%BEAT())/DIV())+1;
+    lastPainted = cur;
+  }
+  raf = requestAnimationFrame(paintPlayhead);
+}
+
+const playBtn=document.getElementById("play"), glyph=document.getElementById("glyph"), playLab=document.getElementById("playlab");
+function start(){
+  boot(); ctx.resume();
+  playing=true; step=0; queue.length=0; lastPainted=-1;
+  nextTime = ctx.currentTime + 0.10;
+  glyph.textContent="■"; playLab.textContent="Stop";
+  timer = setInterval(tick, 25);
+  tick(); raf = requestAnimationFrame(paintPlayhead);
+}
+function stop(){
+  playing=false; clearInterval(timer); timer=null;
+  if(raf){ cancelAnimationFrame(raf); raf=null; }
+  callOn=false; armCall=false; callBtn.classList.remove("armed");
+  glyph.textContent="▶"; playLab.textContent="Play";
+  document.querySelectorAll(".c.now,.c.hit").forEach(c=>c.classList.remove("now","hit"));
+}
+playBtn.onclick = ()=> playing ? stop() : start();
+callBtn.onclick = ()=>{
+  boot(); ctx.resume();
+  armCall = true;
+  callBtn.classList.add("armed");
+  if(!playing) start();
+};
+const handBtn=document.getElementById("handbtn");
+let handsOn = true;
+handBtn.onclick = ()=>{ handsOn = !handsOn;
+  handBtn.setAttribute("aria-pressed", String(handsOn));
+  rowsEl.classList.toggle("nohands", !handsOn); };
+const clickBtn=document.getElementById("clickbtn");
+clickBtn.onclick = ()=>{ clickOn=!clickOn; clickBtn.setAttribute("aria-pressed",String(clickOn)); };
+document.addEventListener("keydown", e=>{
+  if(e.code==="Space" && !/^(INPUT|BUTTON|TEXTAREA|SELECT)$/.test(e.target.tagName)){
+    e.preventDefault(); playing ? stop() : start();
+  }
+});
+
+/* ---------------- rhythm switching ---------------- */
+document.querySelectorAll(".rbtn").forEach(b=>{
+  b.onclick = ()=>{
+    const k = b.dataset.r;
+    if(k === RK) return;
+    const wasPlaying = playing;
+    if(playing) stop();
+    RK = k; PARTS = RHYTHMS[RK].parts;
+    document.querySelectorAll(".rbtn").forEach(o=>o.setAttribute("aria-pressed", String(o.dataset.r===k)));
+    buildBoard(); buildProse();
+    if(wasPlaying) start();
+  };
+});
+
+buildBoard();
+buildProse();
+</script>
