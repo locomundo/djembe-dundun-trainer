@@ -1061,4 +1061,19 @@ document.querySelectorAll(".rbtn").forEach(b=>{
 
 buildBoard();
 buildProse();
+
+/* ---------------- embedding ----------------
+   When framed, tell the host page how tall we are so the iframe can size to
+   its content. Without this the page scrolls inside the frame, which reads
+   badly against a themed site.                                              */
+if (window.parent !== window) {
+  const sendHeight = () => {
+    const h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    window.parent.postMessage({ type: "dundun-trainer:height", height: h }, "*");
+  };
+  if (window.ResizeObserver) new ResizeObserver(sendHeight).observe(document.body);
+  window.addEventListener("load", sendHeight);
+  document.fonts && document.fonts.ready.then(sendHeight);
+  sendHeight();
+}
 </script>
