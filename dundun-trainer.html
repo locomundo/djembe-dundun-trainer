@@ -1067,12 +1067,24 @@ buildProse();
    its content. Without this the page scrolls inside the frame, which reads
    badly against a themed site.                                              */
 if (window.parent !== window) {
+  // Measure .wrap, not scrollHeight. Once the host sizes the iframe to our
+  // reported height the document is at least that tall, so scrollHeight can
+  // only ever grow -- switching to a rhythm with fewer parts would leave a
+  // tall band of empty page below the footer. The wrapper's own box shrinks.
+  const wrap = document.querySelector(".wrap");
+  let last = 0;
   const sendHeight = () => {
-    const h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
-    window.parent.postMessage({ type: "dundun-trainer:height", height: h }, "*");
+    const r = wrap.getBoundingClientRect();
+    // both rects shift together when scrolled, so this is scroll-independent
+    const h = Math.ceil(r.bottom - document.body.getBoundingClientRect().top);
+    if (h > 0 && h !== last) {
+      last = h;
+      window.parent.postMessage({ type: "dundun-trainer:height", height: h }, "*");
+    }
   };
-  if (window.ResizeObserver) new ResizeObserver(sendHeight).observe(document.body);
+  if (window.ResizeObserver) new ResizeObserver(sendHeight).observe(wrap);
   window.addEventListener("load", sendHeight);
+  window.addEventListener("resize", sendHeight);
   document.fonts && document.fonts.ready.then(sendHeight);
   sendHeight();
 }
