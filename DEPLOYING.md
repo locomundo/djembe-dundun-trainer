@@ -94,6 +94,40 @@ a link avoids an iframe fighting the theme for height on a phone.
 
 ---
 
+## As deployed (verified 2026-10-03)
+
+Live at **https://agbodo.nl/ritmes/**, in the main menu as **Ritmes**, next to
+Contact. Verified from outside the browser: page returns 200, the listener
+script survived WordPress, the iframe carries its `id`, and the trainer reports
+"real instruments" (so all 11 samples load from Pages).
+
+The site runs **Enfold 8** with the **Classic Editor**.
+
+### The one thing that decides whether this works
+
+**Paste into the `Tekst` tab, never `Visueel`.** The Classic Editor's visual
+mode strips `<script>` tags, and switching tabs re-runs TinyMCE and strips them
+again — so do not switch back to Visueel before saving. Everything else about
+this deployment was straightforward; this was the only real obstacle.
+
+TinyMCE will also reformat the markup harmlessly (`height:900px` becomes
+`height: 900px;`, `loading="lazy"` is dropped) and sometimes saves invisible
+`<span data-mce-type="bookmark" class="mce_SELRES_start">` cursor artifacts into
+the content. They do nothing, but delete them if you see them.
+
+To check the script survived: save, then reopen the **Tekst** tab. If the
+`<script>` block is gone, it was stripped.
+
+### Page width
+
+The page uses Enfold's **Indeling → Zijbalken** setting (the Dutch label for the
+layout panel). Removing the sidebar widens it, but Enfold still holds the
+content inside the theme's max-width container — it is not edge to edge. True
+full-bleed would need the Avia Layout Builder with a Color Section, which is a
+larger change to the page. The boxed look reads fine as an embedded tool.
+
+---
+
 ## Troubleshooting
 
 **The page loads but there is no sound.**

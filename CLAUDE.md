@@ -186,3 +186,29 @@ four-bar phrase where everything else loops in one or two bars, so the cycle is
 Part keys drive voice selection in both the renderer and the page: `signal`,
 `entrance` and `djembe*` use djembe voices, `sangban`/`sangban2` the sangban
 ones. A new key needs adding in both places.
+
+## Open threads
+
+Things left deliberately unfinished, so they are not rediscovered as surprises.
+
+- **Rumba is not transcribed.** There is no score for it — only three videos of
+  Michael playing the parts solo. Transcribing from the audio was attempted and
+  abandoned: stroke types do not separate (spectral centroid runs 617–1597 Hz as
+  a continuum, ~75% of strokes undifferentiated) and the grid does not lock
+  (comb alignment 0.36–0.55 where >0.8 is needed). The honest routes are a score
+  if one exists, or dictation from someone who plays it. Do not ship a guess.
+- **Two transcriptions have oddities that are faithful to the sheet**, flagged
+  in their own files and worth confirming with Michael: Fankani's doundounba has
+  a gap where a period-8 reading predicts a stroke, and Toro's sangban ends bar 1
+  closed and bar 2 open. Both are what the paper says.
+- **`audio/` is ~1.6 GB** of regenerable output sitting in the working folder.
+  Excluding it from Time Machine would save most of the backup footprint.
+- **The trainer could go edge-to-edge** on agbodo.nl via Enfold's Avia builder,
+  and could be served from `trainer.agbodo.nl` with a DNS CNAME. Neither is
+  needed; both are noted in `DEPLOYING.md`.
+- **Mobile has not been checked** on a real phone — the board scrolls sideways
+  by design, but the iframe auto-height on a small screen is unverified.
+
+See also `~/Documents/backup-review.md` — unrelated to this repo, but it records
+that `~/Google Drive` is a dead local folder that syncs nowhere, which is where
+the source PDFs and lesson videos live.
