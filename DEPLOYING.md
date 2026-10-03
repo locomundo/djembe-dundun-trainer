@@ -177,3 +177,60 @@ or Settings → Pages in the repo.
 README, not the trainer — the repo root reads as a project page and the trainer
 sits at its own path. To make the root *be* the trainer instead, add an
 `index.html` that redirects, or rename the file.
+
+## SEO of the embed page (Yoast)
+
+The site runs Yoast, and the Ritmes page scored red. The score is accurate,
+not a misconfiguration: the page body is a single `<iframe>`, so there is no
+text for Yoast to analyse. More importantly there is none for Google either —
+**iframe content is never attributed to the parent page.** The trainer's own
+text is indexed under `locomundo.github.io`; `agbodo.nl/ritmes/` reads as an
+empty page.
+
+Verified live on 2026-10-03:
+
+    <title>Ritmes - Agbodo Workshops</title>
+    og:description content="&#xFEFF;"   <- the TinyMCE bookmark artifact, not a description
+    headings: none
+    body: one <iframe>, nothing else
+
+So the fix is content, not settings. Three things, in order of payoff.
+
+### 1. Text around the iframe
+
+Roughly 300 words of Dutch, with subheadings, placed **above** the iframe
+(intro) and **below** it (the rest). Draft copy is in `seo-copy-ritmes.md` —
+paste it in the `Tekst` tab, same rule as the embed snippet: never switch to
+`Visueel` before saving, or the `<script>` is stripped.
+
+This alone clears most of Yoast's red bullets: word count, subheading
+distribution, keyphrase in intro, and the "no content" readability flags.
+
+### 2. Yoast fields on the page
+
+- **Focus keyphrase:** `djembé ritmes oefenen`
+- **SEO title:** `Djembé ritmes oefenen | Agbodo Workshops` — this is separate
+  from the page title, so the menu item stays `Ritmes`.
+- **Meta description:** write one. It is currently the stray `&#xFEFF;`
+  character above, which is what leaks into `og:description` when the page is
+  shared on social media.
+- The slug `ritmes` already contains the keyphrase; leave it alone, since
+  changing it breaks the published URL.
+
+### 3. Internal links
+
+Yoast checks for them and they are genuinely useful here: link from the copy
+to the lessons and contact pages, and add a link *to* `/ritmes/` from the
+lessons page. An orphan page ranks poorly however good its content is.
+
+### What not to chase
+
+Green is not the goal — it measures whether a page is written like an article,
+and this one is a tool. Once the copy is in, the remaining red bullets will be
+things like outbound links and keyphrase density, which are not worth
+distorting the text for.
+
+One open question for Michael: the trainer is also reachable at its
+GitHub Pages URL, which can compete with `agbodo.nl` for his own material.
+A `rel="canonical"` or a `noindex` on the GitHub copy would point search
+engines at his site instead. Not done — it is his call.
