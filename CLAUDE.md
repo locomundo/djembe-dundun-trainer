@@ -57,6 +57,7 @@ Symbols, and how to pick them out programmatically:
 | `R L R L` | sticking | printed above the **djembe** staves only; positional, so no need to read it |
 | green notehead + underline | dundun open tone | colour; ignore the short underline blob |
 | ✗ on the beam | bell | sits astride the beam, arms poking above it |
+| curl + small dot + **cue-sized** notehead | **galop** | two very fast strokes, left then right, the second landing on the beat |
 
 **`tools/read_score.py` does this.** It renders the PDF, finds the staves and
 each one's grid, and prints one line per part:
@@ -112,6 +113,37 @@ Two things the Djole sheet does not show up:
 Transcribe literally. Fankani's doundounba has a gap where a period-8 reading
 would predict a stroke; that is what the sheet says, so that is what the
 renderer plays, with the discrepancy flagged in `Fankani.md`.
+
+### Galops
+
+Every signal stave on every sheet opens each bar with a little curl, a stemless
+grace dot, and a **cue-sized notehead sitting exactly on beat 1**. Michael calls
+this *galoperen*: one tone played very fast with both hands, left then right.
+It is a single musical gesture, not an ornament plus a stroke.
+
+The cue notehead is the trap. It is about **17 px wide against the normal 30**,
+so `discs()` rejects it and the beat reads as empty — which is what produced the
+"call sounds at a different moment than the indicator" bug in Gumbé. Measure
+before concluding a beat is empty:
+
+```
+x0=195 w=17 h=17 area=224   grace dot  (no stem, ~25 px before the beat)
+x0=198 w=21 h=21 area=108   the curl   (thin)
+x0=221 w=17 h=56 area=262   cue notehead WITH stem, dead on slot 0
+                 w=30 h=73  what a normal notehead looks like
+```
+
+In the data a galop is `pickup:true` on the part plus a normal stroke on the
+slot: the page sounds the grace half a step early, the renderer does the same.
+Write it in `pat` as a parenthesised `(T)` prefix.
+
+### Begin and Einde arrows
+
+The Dutch markers sit **between** staves. An ↑`Einde` belongs to the row
+**above** it and a ↓`Begin` to the row **below**. `read_score.py` attributes
+each arrow to both neighbours, so a sheet with only `Begin` marks (Garangedon)
+reports a phantom `einde` on every row above one. Check which way the arrow
+points before trusting either field.
 
 ## Rendering audio
 

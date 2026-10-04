@@ -404,6 +404,72 @@ RHYTHMS['toro'] = {
     ],
 }
 
+# SORSORNET is ternary - 12/8, two bars of four beats, so the cycle is 24.
+# Every drum stroke in all three dundun parts lands on a bell stroke.
+RHYTHMS['sorsornet'] = {
+    'div': 3,
+    'name': 'Sorsornet',
+    'slots': 24,
+    'signal': {
+        # the slot-0 tone plus the pick-up is the "galop": two fast strokes,
+        # left then right, the second landing on the beat
+        'drum': strip('T.T|T.T|T.T|T..') * 2,
+        'pickup': 'T',
+        'pan': 0.0,
+        'einde': 21,
+    },
+    'parts': [
+        {'key': 'djembe1', 'label': 'Djembe 1', 'pan': -0.40,
+         'drum': strip('S.T|S..') * 4, 'einde': 21},
+        {'key': 'djembe2', 'label': 'Djembe 2', 'pan': 0.0,
+         'drum': strip('S..|STT') * 4, 'einde': 21},
+        {'key': 'djembe3', 'label': 'Djembe 3', 'pan': 0.40,
+         'drum': strip('SSS|STT') * 4, 'einde': 21},
+        {'key': 'sangban', 'label': 'Sangban', 'pan': -0.15,
+         'drum': strip('O..|.T.') * 4,
+         # the only bell here that crosses the triplet: ends, then middle
+         'bell': strip('x.') * 12, 'einde': 21},
+        {'key': 'kenkeni', 'label': 'Kenkeni', 'pan': 0.15,
+         'drum': strip('..T') * 8,
+         'bell': strip('x.x') * 8, 'einde': 21},
+        {'key': 'doundounba', 'label': 'Doundounba', 'pan': 0.0,
+         'drum': strip('TTT|...|..T|TT.') + strip('TTT|...|...|...'),
+         'bell': strip('xxx|.x.|x.x|xx.') + strip('xxx|x.x|x.x|x.x'),
+         'einde': 21},
+    ],
+}
+
+# GARANGEDON is ternary - 12/8, two bars, cycle 24. All three dundun parts
+# share the identical bell, so one bell carries every part.
+RHYTHMS['garangedon'] = {
+    'div': 3,
+    'name': 'Garangedon',
+    'slots': 24,
+    'signal': {
+        'drum': strip('T.T|T.T|T.T|T..') + strip('T.T|T.T|..T|T..'),
+        'pickup': 'T',
+        'pan': 0.0,
+    },
+    'parts': [
+        {'key': 'djembe1', 'label': 'Djembe 1', 'pan': -0.40,
+         'drum': strip('B.S|..S|..S|..S') + strip('B.S|TTS|TTS|..S'),
+         'begin': 23},
+        {'key': 'djembe2', 'label': 'Djembe 2', 'pan': 0.0,
+         'drum': strip('S.T|S..') * 4},
+        {'key': 'djembe3', 'label': 'Djembe 3', 'pan': 0.40,
+         'drum': strip('S..|STT') * 4},
+        {'key': 'sangban', 'label': 'Sangban', 'pan': -0.15,
+         'drum': strip('T.O|..T|..O|..T') * 2,
+         'bell': strip('x.x') * 8, 'begin': 23},
+        {'key': 'kenkeni', 'label': 'Kenkeni', 'pan': 0.15,
+         'drum': strip('..T|T..') * 4,
+         'bell': strip('x.x') * 8, 'begin': 23},
+        {'key': 'doundounba', 'label': 'Doundounba', 'pan': 0.0,
+         'drum': strip('T.T|T..|..T|T.T') + strip('T.T|...|...|..T'),
+         'bell': strip('x.x') * 8, 'begin': 23},
+    ],
+}
+
 # which voice a drum character maps to, per part
 def voice_for(part_key, ch):
     if part_key in ('signal', 'djembe1', 'djembe2', 'djembe3', 'entrance'):

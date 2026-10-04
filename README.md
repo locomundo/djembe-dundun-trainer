@@ -50,6 +50,11 @@ trainer, written on a subdivision grid:
 O  open dundun tone   M  muted   x  bell
 ```
 
+A signal part additionally carries `pickup:true`, which sounds a grace stroke
+half a slot before each bar. Together with the stroke on the beat that is a
+**galop** — one tone played very fast with both hands, left then right — and it
+is how every call on these sheets begins.
+
 `div` is subdivisions per beat — 4 for a binary rhythm, 3 for a ternary one like
 Gidamba in 12/8. Bar lines, accents and tick labels all derive from it.
 
