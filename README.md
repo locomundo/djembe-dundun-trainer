@@ -4,7 +4,7 @@ Tools for reading one-page West-African drum scores off a PDF, rendering
 play-along audio from them, and drilling the parts — particularly the **dundun**
 parts, where one hand plays the bell and the other the drum.
 
-Pure Python, no third-party packages. The trainer is a single HTML file.
+Pure Python, no third-party packages. The trainer is a single HTML page, plus `nl.js` for its Dutch text.
 
 ## Why
 
@@ -19,6 +19,12 @@ ensemble — which is what this does.
 rhythm it shows every part on a grid, with the dundun parts split into separate
 **drum** and **bell** lanes you can mute independently. Tempo down to 40 bpm,
 sticking, a count, and the call.
+
+It comes in **English and Dutch**, switched with the NL / EN buttons. Add
+`?lang=nl` or `?lang=en` to the URL to choose up front; without it the page
+uses the last choice made in that browser, then the browser's own language.
+The English lives in the page; `nl.js` overlays the Dutch, and any line it lacks
+falls back to English.
 
 Browsers block `fetch()` on `file://`, so serve it rather than double-clicking:
 
@@ -67,7 +73,7 @@ one-shots and synthesis is only the fallback when a sample fails to load.
 
 ## Hosting the trainer
 
-`dundun-trainer.html` needs the `samples/` folder beside it — it fetches the
+`dundun-trainer.html` needs `nl.js` and the `samples/` folder beside it — it fetches the
 WAVs at runtime by relative path. Copy both and it works anywhere static files
 are served; there is nothing to build and no server-side code.
 

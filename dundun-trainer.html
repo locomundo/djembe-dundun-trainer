@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Dundun Trainer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,11 +39,14 @@ body{
 }
 .wrap{max-width:1120px; margin:0 auto; padding-inline:20px; padding-block:0 72px}
 header.mast{padding-block:30px 20px; border-bottom:1px solid var(--line-soft)}
+.mastbar{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:10px 16px; margin-bottom:20px}
+.mastbar .switcher{margin-bottom:0; min-width:0}
+.switcher[hidden]{display:none}
 .switcher{display:flex; flex-wrap:wrap; gap:2px; margin-bottom:20px; border:1px solid var(--line); border-radius:2px; max-width:100%; width:max-content; padding:2px}
-.rbtn{font-family:"IBM Plex Mono",monospace; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+.rbtn,.lbtn{font-family:"IBM Plex Mono",monospace; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
   padding:7px 16px; border-radius:1px; color:var(--faint)}
-.rbtn:hover{color:var(--ink)}
-.rbtn[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); font-weight:600}
+.rbtn:hover,.lbtn:hover{color:var(--ink)}
+.rbtn[aria-pressed="true"],.lbtn[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); font-weight:600}
 .begin{position:absolute; top:-1px; left:50%; transform:translateX(-50%); width:0; height:0;
   border-left:4px solid transparent; border-right:4px solid transparent; border-top:6px solid var(--accent)}
 .lab .beginlab{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.08em;
@@ -165,8 +169,8 @@ h2{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:700; font
 .say .v b{color:var(--accent); font-weight:600}
 
 .drill{counter-reset:d; list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:11px; max-width:66ch}
-.drill li{counter-increment:d; display:grid; grid-template-columns:auto 1fr; gap:13px; font-size:.94rem; color:var(--muted)}
-.drill li::before{content:counter(d); font-family:"IBM Plex Mono",monospace; font-size:.72rem; font-weight:600; color:var(--accent-ink); background:var(--accent); width:21px; height:21px; border-radius:50%; display:grid; place-items:center; margin-top:2px}
+.drill li{counter-increment:d; position:relative; padding-left:34px; font-size:.94rem; color:var(--muted)}
+.drill li::before{content:counter(d); font-family:"IBM Plex Mono",monospace; font-size:.72rem; font-weight:600; color:var(--accent-ink); background:var(--accent); width:21px; height:21px; border-radius:50%; display:grid; place-items:center; position:absolute; left:0; top:2px}
 .drill b{color:var(--ink); font-weight:600}
 
 .notes{display:grid; grid-template-columns:repeat(auto-fit,minmax(266px,1fr)); gap:1px; background:var(--line-soft); border:1px solid var(--line-soft)}
@@ -188,7 +192,8 @@ footer{margin-top:52px; padding-top:20px; border-top:1px solid var(--line-soft);
 </style>
 <div class="wrap">
 <header class="mast">
-  <div class="switcher" style="flex-wrap:wrap" role="group" aria-label="Choose a rhythm">
+  <div class="mastbar">
+  <div class="switcher" style="flex-wrap:wrap" role="group" aria-label="Choose a rhythm" id="rhythms">
     <button class="rbtn" data-r="djole" aria-pressed="true">Djole</button>
     <button class="rbtn" data-r="fankani" aria-pressed="false">Fankani</button>
     <button class="rbtn" data-r="djole-guinee" aria-pressed="false">Djolé&nbsp;(Guinée)</button>
@@ -200,21 +205,26 @@ footer{margin-top:52px; padding-top:20px; border-top:1px solid var(--line-soft);
     <button class="rbtn" data-r="sorsornet" aria-pressed="false">Sorsornet</button>
     <button class="rbtn" data-r="garangedon" aria-pressed="false">Garangedon</button>
   </div>
+  <div class="switcher" role="group" aria-label="Language" id="langs">
+    <button class="lbtn" data-lang="nl" lang="nl" aria-pressed="false" title="Nederlands">NL</button>
+    <button class="lbtn" data-lang="en" lang="en" aria-pressed="true" title="English">EN</button>
+  </div>
+  </div>
   <p class="eyebrow" id="origin">Guinea · 4/4 · two-bar cycle</p>
   <h1 id="rname">Djole</h1>
   <p class="standfirst" id="standfirst"></p>
 
   <div class="transport">
     <button class="play" id="play"><span id="glyph">▶</span><span id="playlab">Play</span></button>
-    <button class="ghost" id="callbtn">Play the call</button>
-    <button class="ghost" id="clickbtn" aria-pressed="false">Click</button>
-    <button class="ghost" id="handbtn" aria-pressed="true">Hands</button>
+    <button class="ghost" id="callbtn" data-i18n="callBtn">Play the call</button>
+    <button class="ghost" id="clickbtn" aria-pressed="false" data-i18n="clickBtn">Click</button>
+    <button class="ghost" id="handbtn" aria-pressed="true" data-i18n="handsBtn">Hands</button>
     <div class="tempo">
-      <label for="bpm">Tempo</label>
+      <label for="bpm" data-i18n="tempo">Tempo</label>
       <input type="range" id="bpm" min="40" max="148" step="1" value="88">
       <div class="bpm"><span id="bpmval">88</span> <em>bpm</em></div>
     </div>
-    <div class="counter">bar <b id="barno">1</b> · beat <b id="beatno">1</b>
+    <div class="counter"><span data-i18n="bar">bar</span> <b id="barno">1</b> · <span data-i18n="beat">beat</span> <b id="beatno">1</b>
       &nbsp;·&nbsp; <b id="srcbadge">samples load on play</b></div>
   </div>
 </header>
@@ -222,27 +232,27 @@ footer{margin-top:52px; padding-top:20px; border-top:1px solid var(--line-soft);
 <div class="board">
   <div class="scroller"><div class="rows" id="rows"></div></div>
   <div class="legend">
-    <div class="lg"><em class="b">B</em> bass</div>
-    <div class="lg"><em>T</em> tone</div>
-    <div class="lg"><em class="s">S</em> slap</div>
-    <div class="lg"><em class="o">O</em> open dundun tone</div>
-    <div class="lg"><em>M</em> muted dundun tone</div>
-    <div class="lg"><em>✕</em> bell</div>
-    <div class="lg"><em class="u"></em> both hands together</div>
-    <div class="lg"><em class="e">▲</em> where the piece ends</div>
-    <div class="lg"><em>R</em>/<em>L</em> which hand — djembe parts only</div>
+    <div class="lg"><em class="b">B</em> <span data-i18n="lgBass">bass</span></div>
+    <div class="lg"><em>T</em> <span data-i18n="lgTone">tone</span></div>
+    <div class="lg"><em class="s">S</em> <span data-i18n="lgSlap">slap</span></div>
+    <div class="lg"><em class="o">O</em> <span data-i18n="lgOpen">open dundun tone</span></div>
+    <div class="lg"><em>M</em> <span data-i18n="lgMuted">muted dundun tone</span></div>
+    <div class="lg"><em>✕</em> <span data-i18n="lgBell">bell</span></div>
+    <div class="lg"><em class="u"></em> <span data-i18n="lgBoth">both hands together</span></div>
+    <div class="lg"><em class="e">▲</em> <span data-i18n="lgEnd">where the piece ends</span></div>
+    <div class="lg"><em>R</em>/<em>L</em> <span data-i18n="lgHand">which hand — djembe parts only</span></div>
   </div>
 </div>
 
-<h2>Learning the dunduns, easiest first</h2>
+<h2 data-i18n="h2Ladder">Learning the dunduns, easiest first</h2>
 <p class="sect-note" id="laddernote"></p>
 <div class="ladder" id="ladder"></div>
 
-<h2>How to actually drill it</h2>
-<p class="sect-note">The trap is practising both hands at once from the start and hoping they separate.
+<h2 data-i18n="h2Drill">How to actually drill it</h2>
+<p class="sect-note" data-i18n="drillIntro">The trap is practising both hands at once from the start and hoping they separate.
 They don't — you get two half-learned parts. The bell has to become automatic <b>first</b>, because in
 performance it is the part that never stops.</p>
-<ol class="drill">
+<ol class="drill" data-i18n="drillSteps">
   <li><b>Bell alone, until it is boring.</b> Switch the drum lane off above and play only the bell,
   for minutes at a time, until you can hold a conversation over it.</li>
   <li><b>Sing the drum part over it.</b> Keep playing the bell and only <b>voice</b> the drum strokes.
@@ -257,21 +267,22 @@ performance it is the part that never stops.</p>
   <li><b>Practise away from the drums.</b> Bell hand on one knee, drum hand on the other. Most of this
   is a brain problem, not a hands problem.</li>
 </ol>
-<p class="sect-note" style="margin-top:22px">Most players give the bell to the weaker hand and the
+<p class="sect-note" style="margin-top:22px" data-i18n="drillHands">Most players give the bell to the weaker hand and the
 stick to the stronger one, since the drum strokes carry the dynamics — but follow whatever your
 teacher does, because switching later is genuinely annoying.</p>
 
-<h2>How each part sits</h2>
+<h2 data-i18n="h2Parts">How each part sits</h2>
 <p class="sect-note" id="partsnote"></p>
 <div class="notes" id="notes"></div>
 
-<footer>Rhythms taught and notated by <a href="https://agbodo.nl" style="color:var(--accent)">Michael Agbodo</a>;
+<footer data-i18n="footer">Rhythms taught and notated by <a href="https://agbodo.nl" style="color:var(--accent)">Michael Agbodo</a>;
 traditional West-African repertoire, transcribed from his scores — six or seven staves each, on a sixteenth-note grid
-(Gidamba in twelve-eight). Sticking is positional: every even slot is the right hand, every odd one
+(the 12/8 rhythms — Gidamba, Sorsornet, Garangedon — on a grid of threes). Sticking is positional: every even slot is the right hand, every odd one
 the left, which is what the sheets print above the djembe staves. Sounds are recorded instruments from Freesound, trimmed and level-matched;
 the three dunduns come from one session, the djembe strokes from three different drums. Mostly CC0 —
 djembe slap sample by klemmy via Freesound, CC&nbsp;BY&nbsp;3.0.</footer>
 </div>
+<script src="nl.js" charset="utf-8"></script>
 <script>
 "use strict";
 let CYCLE = 32;
@@ -279,7 +290,7 @@ const x = (s) => s.replace(/[|\s]/g,"");
 const rep = (s,n) => x(s).repeat(n);
 const CALL = { key:"signal", name:"Signal", sub:"call", call:true, pickup:true,
   drum: rep("T.TT|.T.T|T.SS|S...",2),
-  blurb:"The call. Tones through the first half, then three slaps to announce the break. Each bar is led into by a pick-up tone on the sixteenth before beat 1.",
+  blurb:"The call. Tones through the first half, then three slaps to announce the break. Each bar opens with a <b>galop</b> — a grace tone just before beat 1 and the tone on the beat, played very fast, left then right.",
   pat:"(T) T . T T &nbsp; . T . T &nbsp; T . S S &nbsp; S . . ." };
 
 const RHYTHMS = {
@@ -318,6 +329,7 @@ const RHYTHMS = {
        say:["say the composite","<b>BOTH</b> &nbsp; – &nbsp; ka &nbsp; ka &nbsp; – &nbsp; ka &nbsp; ka &nbsp; –"]},
     ],
     note:"The three dundun parts are not equally hard, and the score says why: it comes down to <b>how often the two hands coincide</b>.",
+    partsnote:"Only Djembé&nbsp;2 uses the full two bars. Everything else is a shorter loop tiled inside the cycle.",
   },
 
   fankani: {
@@ -357,6 +369,7 @@ const RHYTHMS = {
        say:["say the composite","<b>BOTH</b> &nbsp; – &nbsp; ka &nbsp; ka &nbsp; – &nbsp; ka &nbsp; ka &nbsp; –"]},
     ],
     note:"In Fankani <b>every drum stroke lands on a bell stroke</b>, in all three parts — the drum hand never moves alone. The whole difficulty is holding the bell while the drum hand rests.",
+    partsnote:"Both dundun drum lines are full two-bar phrases with their own <b>Begin</b> marks, shown as a small arrow on the grid. The djembe parts are short loops.",
   },
 
   "djole-guinee": {
@@ -490,7 +503,7 @@ const RHYTHMS = {
   "soli-lent": {
     div:4,
     name:"Soli Lent", origin:"4/4 · two-bar cycle · slow",
-    standfirst:"Slow, and built on <b>two-bar djembe phrases</b> rather than short loops — both djembe parts run the full sixteen slots before repeating. The doundounba is the sparsest on any of these sheets: <b>three strokes in the whole cycle</b>.",
+    standfirst:"Slow, and built on <b>full-bar djembe phrases</b> rather than short loops — both djembe parts run the full sixteen slots before repeating. The doundounba is the sparsest on any of these sheets: <b>three strokes in the whole cycle</b>.",
     parts:[
       { key:"signal", name:"Signal", sub:"call", call:true, pickup:true,
         drum: rep("T.TT|.T.T|T.SS|S...",2),
@@ -686,7 +699,7 @@ const RHYTHMS = {
         pat:"S . . &nbsp; S T T" },
       { key:"sangban", name:"Sangban", sub:"one bar", dun:true, begin:23,
         drum: rep("T.O|..T|..O|..T",2), bell: rep("x.x",8),
-        blurb:"The one part that uses <b>both</b> dundun tones: closed on beat 1, then <b>open</b> on the li, and open again on beat 3's li. Ten strokes to the bar and every one of them on a bell stroke.",
+        blurb:"The one part that uses <b>both</b> dundun tones: closed on beat 1, then <b>open</b> on the li, and open again on beat 3's li. Ten strokes in the cycle and every one of them on a bell stroke.",
         pat:"drum &nbsp; T . O &nbsp; . . T &nbsp; . . O &nbsp; . . T<br>bell &nbsp; ✕ . ✕ &nbsp; ✕ . ✕ &nbsp; ✕ . ✕ &nbsp; ✕ . ✕" },
       { key:"kenkeni", name:"Kenkeni", sub:"two beats", dun:true, begin:23,
         drum: rep("..T|T..",4), bell: rep("x.x",8),
@@ -820,7 +833,6 @@ function boot(){
   loadSamples();
 }
 
-const badge = () => document.getElementById("srcbadge");
 async function loadSamples(){
   let ok = 0, total = 0;
   await Promise.all(Object.entries(SAMPLES).map(async ([voice, files])=>{
@@ -836,9 +848,8 @@ async function loadSamples(){
     }
     if(bank.length){ VB[voice] = bank; SAMPLED[voice] = true; }
   }));
-  const b = badge();
-  if(b) b.textContent = ok === total ? "real instruments"
-       : ok ? `${ok}/${total} sampled` : "synthesised";
+  badgeState = ok === total ? ["real"] : ok ? ["partial", {ok, total}] : ["synth"];
+  renderBadge();
 }
 
 let rr = 0;
@@ -865,10 +876,81 @@ function voiceFor(key, ch){
   return null;
 }
 
+
+/* ---------------- language ----------------
+   English lives in the markup and in RHYTHMS; nl.js overlays Dutch on top.
+   Anything nl.js leaves out falls back to English, so a missing translation
+   shows up as an English line rather than a blank.                         */
+const NL = window.NL_TEXT || null;
+const EN_UI = {
+  play:"Play", stop:"Stop", countHands:"count / hands", useCall:"use “play the call”",
+  begins:"begins", ends:"ends", barWord:"bar", beatWord:"beat", and:"&",
+  drum:"DRUM", bell:"BELL", playLane:"PLAY", solo:"SOLO",
+  drumLabel:"Drum", bellLabel:"Bell", playLabel:"Play", soloLabel:"Solo",
+  beginTitle:"the part's own cycle begins here", eindeTitle:"Einde — the piece ends on this stroke",
+  loadOnPlay:"samples load on play", real:"real instruments", partial:"{ok}/{total} sampled", synth:"synthesised",
+  chooseRhythm:"Choose a rhythm", language:"Language",
+  partsNote:"The small label under each part's name says how long its loop is. Shorter loops repeat inside the cycle, so the grid shows the longest part exactly once.",
+};
+const STATIC_EN = {};
+document.querySelectorAll("[data-i18n]").forEach(el => STATIC_EN[el.dataset.i18n] = el.innerHTML);
+
+function pickLang(){
+  const q = new URLSearchParams(location.search).get("lang");
+  if(q === "nl" || q === "en") return q;
+  try{ const s = localStorage.getItem("dundun-lang"); if(s === "nl" || s === "en") return s; }catch(e){}
+  return (navigator.language || "").toLowerCase().startsWith("nl") ? "nl" : "en";
+}
+let LANG = NL ? pickLang() : "en";
+const nl = () => LANG === "nl" && NL;
+const t = k => (nl() && NL.ui[k]) || EN_UI[k] || STATIC_EN[k];
+const fill = (s, v) => s.replace(/\{(\w+)\}/g, (_, k) => v[k]);
+
+function rhythmText(rk){
+  const R = RHYTHMS[rk], N = (nl() && NL.rhythms[rk]) || {};
+  if(nl() && !NL.rhythms[rk]) console.warn("nl.js: no Dutch for rhythm", rk);
+  return {
+    origin: N.origin || R.origin, standfirst: N.standfirst || R.standfirst,
+    note: N.note || R.note, partsnote: N.partsnote || R.partsnote || t("partsNote"),
+    ladder: R.ladder.map((s,i) => Object.assign({}, s, (N.ladder || [])[i])),
+  };
+}
+// the pattern lines carry their own row labels ("drum", "bell", "bar 1")
+function localisePat(pat){
+  if(!nl()) return pat;
+  return pat.replace(/\bdrum\b/g, NL.pat.drum).replace(/\bbell\b/g, NL.pat.bell).replace(/\bbar\b/g, NL.pat.bar);
+}
+function partText(p){
+  const N = (nl() && NL.rhythms[RK] && NL.rhythms[RK].parts[p.key])
+         || (nl() && p.blurb === CALL.blurb && NL.call) || {};
+  if(nl() && !N.blurb) console.warn("nl.js: no Dutch blurb for", RK, p.key);
+  return {
+    name: (nl() && NL.names[p.name]) || p.name,
+    sub:  (nl() && NL.subs[p.sub]) || p.sub,
+    blurb: N.blurb || p.blurb, pat: localisePat(p.pat),
+  };
+}
+
+let badgeState = ["loadOnPlay"];
+function renderBadge(){
+  const b = document.getElementById("srcbadge"), [k, v] = badgeState;
+  if(b) b.textContent = fill(t(k), v || {});
+}
+
+function applyStatic(){
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("[data-i18n]").forEach(el => el.innerHTML = t(el.dataset.i18n));
+  document.getElementById("rhythms").setAttribute("aria-label", t("chooseRhythm"));
+  document.getElementById("langs").setAttribute("aria-label", t("language"));
+  document.querySelectorAll(".lbtn").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === LANG)));
+  document.getElementById("playlab").textContent = playing ? t("stop") : t("play");
+  renderBadge();
+}
+
 /* ---------------- board ---------------- */
 let state = {}, cells = {}, lanesEl = {};
 const rowsEl = document.getElementById("rows");
-const COUNT = { 4:["1","e","&","a"], 3:["1","la","li"] };
+const COUNT = () => ({ 4:["1","e",t("and"),"a"], 3:["1","la","li"] });
 const DIV  = () => RHYTHMS[RK].div || 4;
 const BEAT = () => DIV() * 4;            // slots per bar
 const NSLOT= () => RHYTHMS[RK].parts.reduce((m,p)=>Math.max(m,p.drum.length),0);
@@ -876,9 +958,9 @@ const NSLOT= () => RHYTHMS[RK].parts.reduce((m,p)=>Math.max(m,p.drum.length),0);
 function buildRuler(){
   const ruler = document.createElement("div");
   ruler.className = "ruler";
-  ruler.innerHTML = '<div class="spacer"><span class="sub">count / hands</span></div>';
+  ruler.innerHTML = `<div class="spacer"><span class="sub">${t("countHands")}</span></div>`;
   const ticks = document.createElement("div"); ticks.className = "ticks";
-  const d = DIV(), bar = BEAT(), names = COUNT[d];
+  const d = DIV(), bar = BEAT(), names = COUNT()[d];
   for(let i=0;i<CYCLE;i++){
     const t = document.createElement("div");
     t.className = "tick" + (i%bar===0 ? " bar" : i%d===0 ? " beat" : "");
@@ -900,14 +982,14 @@ function buildRuler(){
   return ruler;
 }
 
-function buildBoard(){
+function buildBoard(keepState){
   rowsEl.textContent = "";
   CYCLE = NSLOT();
   rowsEl.classList.toggle("nohands", !handsOn);
   rowsEl.style.setProperty("--n", CYCLE);
   rowsEl.style.minWidth = (190 + CYCLE * 19) + "px";
-  state = {}; cells = {}; lanesEl = {};
-  PARTS.forEach(p => state[p.key] = { drum:true, bell:true, solo:false });
+  cells = {}; lanesEl = {}; lastPainted = -1;
+  if(!keepState){ state = {}; PARTS.forEach(p => state[p.key] = { drum:true, bell:true, solo:false }); }
   rowsEl.appendChild(buildRuler());
 
   PARTS.forEach(p=>{
@@ -916,29 +998,30 @@ function buildBoard(){
 
     const lab = document.createElement("div");
     lab.className = "lab";
-    const mark = p.begin !== undefined ? ["begins", p.begin]
-               : p.einde !== undefined ? ["ends", p.einde] : null;
+    const pt = partText(p);
+    const mark = p.begin !== undefined ? [t("begins"), p.begin]
+               : p.einde !== undefined ? [t("ends"), p.einde] : null;
     const beginTxt = mark
-      ? `<div class="beginlab">${mark[0]} bar ${Math.floor(mark[1]/BEAT())+1} · beat ${Math.floor((mark[1]%BEAT())/DIV())+1}</div>` : "";
-    lab.innerHTML = `<div><div class="nm">${p.name}</div><div class="sub">${p.sub}</div>${beginTxt}</div>`;
+      ? `<div class="beginlab">${mark[0]} ${t("barWord")} ${Math.floor(mark[1]/BEAT())+1} · ${t("beatWord")} ${Math.floor((mark[1]%BEAT())/DIV())+1}</div>` : "";
+    lab.innerHTML = `<div><div class="nm">${pt.name}</div><div class="sub">${pt.sub}</div>${beginTxt}</div>`;
     const ctl = document.createElement("div"); ctl.className = "ctl";
     if(p.call){
-      ctl.innerHTML = '<span class="sub">use “play the call”</span>';
+      ctl.innerHTML = `<span class="sub">${t("useCall")}</span>`;
     } else {
       const mk = (text, lane, label) => {
         const b = document.createElement("button");
         b.textContent = text;
         b.setAttribute("aria-pressed", String(state[p.key][lane]));
-        b.setAttribute("aria-label", `${label} — ${p.name}`);
+        b.setAttribute("aria-label", `${label} — ${pt.name}`);
         b.onclick = ()=>{ state[p.key][lane] = !state[p.key][lane];
                           b.setAttribute("aria-pressed", String(state[p.key][lane])); paintRows(); };
         return b;
       };
-      ctl.appendChild(mk(p.bell ? "DRUM" : "PLAY", "drum", p.bell ? "Drum" : "Play"));
-      if(p.bell) ctl.appendChild(mk("BELL", "bell", "Bell"));
+      ctl.appendChild(mk(p.bell ? t("drum") : t("playLane"), "drum", p.bell ? t("drumLabel") : t("playLabel")));
+      if(p.bell) ctl.appendChild(mk(t("bell"), "bell", t("bellLabel")));
       const sb = document.createElement("button");
-      sb.textContent="SOLO"; sb.setAttribute("aria-pressed","false");
-      sb.setAttribute("aria-label","Solo "+p.name);
+      sb.textContent = t("solo"); sb.setAttribute("aria-pressed", String(state[p.key].solo));
+      sb.setAttribute("aria-label", t("soloLabel")+" "+pt.name);
       sb.onclick = ()=>{ state[p.key].solo = !state[p.key].solo;
                          sb.setAttribute("aria-pressed", String(state[p.key].solo)); paintRows(); };
       ctl.appendChild(sb);
@@ -966,11 +1049,11 @@ function buildBoard(){
         }
         if(kind==="drum" && p.begin === i){
           const m=document.createElement("span"); m.className="begin";
-          m.title="the part's own cycle begins here"; c.appendChild(m);
+          m.title=t("beginTitle"); c.appendChild(m);
         }
         if(kind==="drum" && p.einde === i){
           const m=document.createElement("span"); m.className="einde";
-          m.title="Einde — the piece ends on this stroke"; c.appendChild(m);
+          m.title=t("eindeTitle"); c.appendChild(m);
         }
         lane.appendChild(c); cells[p.key][kind].push(c);
       }
@@ -998,12 +1081,12 @@ function paintRows(){
 }
 
 function buildProse(){
-  const R = RHYTHMS[RK];
+  const R = RHYTHMS[RK], T = rhythmText(RK);
   document.getElementById("rname").textContent = R.name;
-  document.getElementById("origin").textContent = R.origin;
-  document.getElementById("standfirst").innerHTML = R.standfirst;
-  document.getElementById("laddernote").innerHTML = R.note;
-  document.getElementById("ladder").innerHTML = R.ladder.map((s,i)=>`
+  document.getElementById("origin").textContent = T.origin;
+  document.getElementById("standfirst").innerHTML = T.standfirst;
+  document.getElementById("laddernote").innerHTML = T.note;
+  document.getElementById("ladder").innerHTML = T.ladder.map((s,i)=>`
     <div class="step">
       <div class="no">${i+1}</div>
       <div>
@@ -1012,16 +1095,13 @@ function buildProse(){
         <div class="say"><span class="k">${s.say[0]}</span><span class="v">${s.say[1]}</span></div>
       </div>
     </div>`).join("");
-  document.getElementById("partsnote").innerHTML =
-    RK === "djole"
-      ? "Only Djembé&nbsp;2 uses the full two bars. Everything else is a shorter loop tiled inside the cycle."
-      : "Both dundun drum lines are full two-bar phrases with their own <b>Begin</b> marks, shown as a small arrow on the grid. The djembe parts are short loops.";
-  document.getElementById("notes").innerHTML = PARTS.map(p=>`
+  document.getElementById("partsnote").innerHTML = T.partsnote;
+  document.getElementById("notes").innerHTML = PARTS.map(p=>{ const pt = partText(p); return `
     <div class="note">
-      <h3>${p.name} <span>${p.sub}</span></h3>
-      <p>${p.blurb}</p>
-      <div class="pat">${p.pat}</div>
-    </div>`).join("");
+      <h3>${pt.name} <span>${pt.sub}</span></h3>
+      <p>${pt.blurb}</p>
+      <div class="pat">${pt.pat}</div>
+    </div>`; }).join("");
 }
 
 /* ---------------- transport ---------------- */
@@ -1108,7 +1188,7 @@ function start(){
   boot(); ctx.resume();
   playing=true; step=0; queue.length=0; lastPainted=-1;
   nextTime = ctx.currentTime + 0.10;
-  glyph.textContent="■"; playLab.textContent="Stop";
+  glyph.textContent="■"; playLab.textContent=t("stop");
   timer = setInterval(tick, 25);
   tick(); raf = requestAnimationFrame(paintPlayhead);
 }
@@ -1116,7 +1196,7 @@ function stop(){
   playing=false; clearInterval(timer); timer=null;
   if(raf){ cancelAnimationFrame(raf); raf=null; }
   callOn=false; armCall=false; callBtn.classList.remove("armed");
-  glyph.textContent="▶"; playLab.textContent="Play";
+  glyph.textContent="▶"; playLab.textContent=t("play");
   document.querySelectorAll(".c.now,.c.hit").forEach(c=>c.classList.remove("now","hit"));
 }
 playBtn.onclick = ()=> playing ? stop() : start();
@@ -1153,6 +1233,18 @@ document.querySelectorAll(".rbtn").forEach(b=>{
   };
 });
 
+/* ---------------- language switching ---------------- */
+function setLang(l){
+  if(l === LANG || !NL) return;
+  LANG = l;
+  try{ localStorage.setItem("dundun-lang", l); }catch(e){}
+  try{ const u = new URL(location.href); u.searchParams.set("lang", l); history.replaceState(null, "", u); }catch(e){}
+  applyStatic(); buildBoard(true); buildProse();
+}
+document.querySelectorAll(".lbtn").forEach(b => b.onclick = () => setLang(b.dataset.lang));
+if(!NL) document.getElementById("langs").hidden = true;
+
+applyStatic();
 buildBoard();
 buildProse();
 

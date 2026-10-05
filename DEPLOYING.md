@@ -35,7 +35,7 @@ Block**) → paste:
 
 ```html
 <iframe id="dundun-trainer"
-        src="https://locomundo.github.io/djembe-dundun-trainer/dundun-trainer.html"
+        src="https://locomundo.github.io/djembe-dundun-trainer/dundun-trainer.html?lang=nl"
         style="width:100%;height:900px;border:0" loading="lazy"
         title="Dundun Trainer"></iframe>
 <script>
@@ -47,6 +47,10 @@ window.addEventListener("message", function (e) {
 });
 </script>
 ```
+
+`?lang=nl` opens the trainer in Dutch for agbodo.nl's visitors; they can still
+switch to English with the EN button. Leave it off and the page follows the
+visitor's browser language instead.
 
 The trainer posts its height to the host page, and that listener resizes the
 iframe to match — so the page grows to fit instead of scrolling inside the

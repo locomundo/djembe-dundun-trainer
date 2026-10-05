@@ -212,8 +212,22 @@ four-bar phrase where everything else loops in one or two bars, so the cycle is
 4. Verify by detecting onsets in the rendered WAV and snapping them to the grid
    — they must land on integers. Extra positions mean a false detection (a loud
    stroke masks the next); *missing* positions mean a real bug.
-5. Add the rhythm to `RHYTHMS` in the trainer page and a button to the switcher.
+5. Add the rhythm to `RHYTHMS` in the trainer page and a button to the switcher,
+   then its Dutch to `nl.js` — same keys, ladder steps in the same order.
 6. Add the row to the table in `README.md`.
+
+### The two languages
+
+English is the source: it lives in the markup and in `RHYTHMS`. `nl.js` sets
+`window.NL_TEXT`, which overlays it — `ui` keyed by the markup's `data-i18n`
+attributes plus the script's `EN_UI` labels, `rhythms` mirroring `RHYTHMS`.
+Anything missing falls back to English and is named in the browser console, so
+a forgotten translation is an English line, never a blank. To check coverage,
+compare every `RHYTHMS` part key, ladder step and `data-i18n` key against
+`nl.js`. The term list at the top of `nl.js` keeps the vocabulary consistent
+(*trom*, *bel*, *tel*, *maat*, *vakje*, *SAMEN*, counting *1 e en a*); the
+ruler swaps `&` for `en` in Dutch. Patterns, part names and the Dutch sheet
+markers *Begin* / *Einde* are shared by both languages.
 
 Part keys drive voice selection in both the renderer and the page: `signal`,
 `entrance` and `djembe*` use djembe voices, `sangban`/`sangban2` the sangban
@@ -243,6 +257,11 @@ Things left deliberately unfinished, so they are not rediscovered as surprises.
   content typed in the Classic Editor's **Tekst** tab — and that tab is the only
   one that preserves the embed `<script>`. The served page really does carry the
   five H2s and both internal links; see `DEPLOYING.md`.
+- **The Dutch translation has not been reviewed by Michael** (added
+  2026-10-05). Check his own words for the strokes and techniques especially —
+  *galop*, *dicht/gedempt*, *trom* for the dundun drum side. The Fankani
+  doundounba blurb says "Zo staat het op het blad" where the English suggests
+  checking with your teacher, since on his site the teacher is him.
 - **`audio/` is ~1.6 GB** of regenerable output sitting in the working folder.
   Excluding it from Time Machine would save most of the backup footprint.
 - **The trainer could go edge-to-edge** on agbodo.nl via Enfold's Avia builder,
