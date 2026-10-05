@@ -229,10 +229,20 @@ Things left deliberately unfinished, so they are not rediscovered as surprises.
   a continuum, ~75% of strokes undifferentiated) and the grid does not lock
   (comb alignment 0.36–0.55 where >0.8 is needed). The honest routes are a score
   if one exists, or dictation from someone who plays it. Do not ship a guess.
-- **Two transcriptions have oddities that are faithful to the sheet**, flagged
+- **Three transcriptions have oddities that are faithful to the sheet**, flagged
   in their own files and worth confirming with Michael: Fankani's doundounba has
-  a gap where a period-8 reading predicts a stroke, and Toro's sangban ends bar 1
-  closed and bar 2 open. Both are what the paper says.
+  a gap where a period-8 reading predicts a stroke, Toro's sangban ends bar 1
+  closed and bar 2 open, and Garangedon's signal differs between its two bars —
+  bar 2 drops the stroke on beat 3 and answers on the **li** instead. All three
+  are what the paper says; the Garangedon one is the likeliest engraving slip,
+  since the bars are otherwise identical.
+- **The Yoast focus keyphrase on agbodo.nl/ritmes/ was still unset** as of
+  2026-10-03. Setting it to `djembé ritmes oefenen` clears eight of the thirteen
+  red bullets at once. The meta description is done. Yoast will keep reporting
+  *Tekstlengte: 0 woorden* regardless, because its live analysis does not read
+  content typed in the Classic Editor's **Tekst** tab — and that tab is the only
+  one that preserves the embed `<script>`. The served page really does carry the
+  five H2s and both internal links; see `DEPLOYING.md`.
 - **`audio/` is ~1.6 GB** of regenerable output sitting in the working folder.
   Excluding it from Time Machine would save most of the backup footprint.
 - **The trainer could go edge-to-edge** on agbodo.nl via Enfold's Avia builder,
